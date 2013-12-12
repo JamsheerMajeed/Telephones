@@ -24,8 +24,8 @@ import static in.orangecounty.impl.Constants.*;
  * Modified on: 29/11/13
  * Modified at: 11:53 AM
  */
-public class ListenerImpl implements SerialPortEventListener {
-    Logger log = LoggerFactory.getLogger(ListenerImpl.class);
+public class ListenerSerialEventImpl implements SerialPortEventListener {
+    Logger log = LoggerFactory.getLogger(ListenerSerialEventImpl.class);
     private InputStream in;
     private ListenerSenderInterface sender;
     private final ScheduledExecutorService scheduler;
@@ -34,7 +34,7 @@ public class ListenerImpl implements SerialPortEventListener {
     /**
      * Initialize.
      */
-    public ListenerImpl(InputStream in, ListenerSenderInterface sender) {
+    public ListenerSerialEventImpl(InputStream in, ListenerSenderInterface sender) {
         this.in = in;
         this.sender = sender;
         scheduler = Executors.newScheduledThreadPool(1);
@@ -123,12 +123,7 @@ public class ListenerImpl implements SerialPortEventListener {
     public void serialEvent(SerialPortEvent serialPortEvent) {
         switch (serialPortEvent.getEventType()) {
             case DATA_AVAILABLE:
-                try {
-                    Thread.sleep(300);
-                } catch (InterruptedException e) {
-                    log.error("InterruptedException : ", e);
-                }
-                readSerial();
+                processMessage(readSerial());
                 break;
         }
     }
@@ -136,18 +131,29 @@ public class ListenerImpl implements SerialPortEventListener {
     /**
      * Buffer to hold the reading
      */
-    private byte[] readBuffer = new byte[BUFFER_SIZE];
 
-    private void readSerial() {
-        try {
-            int availableBytes = in.available();
-            if (availableBytes > 0) {
-                // Read the serial port
-                in.read(readBuffer, 0, availableBytes);
-                interpretMessage(readBuffer);
+
+    private byte[] readSerial() {
+        byte[] readBuffer = new byte[BUFFER_SIZE];
+        int index = 0;
+        while(true){
+            try {
+                readBuffer[index] = (byte) in.read();
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-        } catch (IOException e) {
-            log.debug("IOException : ", e);
+            if (readBuffer[0] == ACK || readBuffer[0] == NAK || readBuffer[0] == ENQ || readBuffer[0] == EOT) {
+                break;
+            } else if (Arrays.equals(Arrays.copyOfRange(readBuffer, 0, 2), DLE_SEND)) {
+                break;
+            } else if (Arrays.equals(Arrays.copyOfRange(readBuffer, 0, 2), DLE_STOP)) {
+                break;
+            } else if (Arrays.equals(Arrays.copyOfRange(readBuffer, 0, 3), SELECTING_SEQUENCE)) {
+                break;
+            } else if(readBuffer[index-1] == ETX){
+                break;
+            }
         }
+        return Arrays.copyOf(readBuffer, index);
     }
 }

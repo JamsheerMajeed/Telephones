@@ -26,7 +26,7 @@ public class ListenerTest {
     Logger log = LoggerFactory.getLogger(ListenerTest.class);
     OutputStream os;
     ListenerSenderInterface sender;
-    ListenerImpl listener;
+    ListenerSerialEventImpl listener;
     SerialPortEventListener spel;
     @Before
     public void setup(){
@@ -34,7 +34,7 @@ public class ListenerTest {
             PipedInputStream in = new PipedInputStream();
             os = new PipedOutputStream(in);
             sender = mock(ListenerSenderInterface.class);
-            listener = new ListenerImpl(in, sender);
+            listener = new ListenerSerialEventImpl(in, sender);
             spel = listener;
         } catch (IOException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.

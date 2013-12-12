@@ -2,15 +2,13 @@ package in.orangecounty.cli;
 
 import in.orangecounty.TelephoneCommands;
 import in.orangecounty.helper.SerialHelper;
-import in.orangecounty.impl.ListenerImpl;
+import in.orangecounty.impl.ListenerSerialEventImpl;
 import in.orangecounty.impl.SenderImpl;
 import in.orangecounty.impl.TelephoneCommandImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
 import java.util.TooManyListenersException;
 import java.util.concurrent.*;
 
@@ -23,7 +21,7 @@ public class ConsoleInput implements Runnable {
     private boolean running;
     private TelephoneCommands telephoneCommands;
     private SenderImpl sender;
-    private ListenerImpl listner;
+    private ListenerSerialEventImpl listner;
     SerialHelper serialHelper;
 
     public void start() {
@@ -34,7 +32,7 @@ public class ConsoleInput implements Runnable {
             log.debug("Serial Connect Called");
             sender = new SenderImpl(serialHelper.getSerialOutputStream());
             log.debug("Sender Created");
-            listner = new ListenerImpl(serialHelper.getSerialInputStream(), sender);
+            listner = new ListenerSerialEventImpl(serialHelper.getSerialInputStream(), sender);
             log.debug("Listener Created");
             telephoneCommands = new TelephoneCommandImpl(sender);
             log.debug("Telephone Command Created");
@@ -46,7 +44,7 @@ public class ConsoleInput implements Runnable {
         }
     }
 
-    public void start(TelephoneCommands telephoneCommands, SenderImpl sender, ListenerImpl listner, SerialHelper serialHelper) {
+    public void start(TelephoneCommands telephoneCommands, SenderImpl sender, ListenerSerialEventImpl listner, SerialHelper serialHelper) {
         this.telephoneCommands = telephoneCommands;
         this.sender = sender;
         this.listner = listner;
