@@ -121,6 +121,7 @@ public class ListenerSerialEventImpl implements SerialPortEventListener {
 
     @Override
     public void serialEvent(SerialPortEvent serialPortEvent) {
+        log.debug("Serial Event" + serialPortEvent);
         switch (serialPortEvent.getEventType()) {
             case DATA_AVAILABLE:
                 processMessage(readSerial());
