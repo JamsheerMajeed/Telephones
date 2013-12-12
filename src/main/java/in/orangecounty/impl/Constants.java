@@ -14,7 +14,7 @@ public class Constants {
 
     public static final byte[] STATUS_ENQUIRY = {2,49,33,76,55,48,48,55,48,32,32,3,111};
 
-    public static final int BUFFER_SIZE = 256;
+    public static final int BUFFER_SIZE = 128;
 
 
     /**

@@ -124,7 +124,7 @@ public class ListenerImpl implements SerialPortEventListener {
         switch (serialPortEvent.getEventType()) {
             case DATA_AVAILABLE:
                 try {
-                    Thread.sleep(150);
+                    Thread.sleep(300);
                 } catch (InterruptedException e) {
                     log.error("InterruptedException : ", e);
                 }
