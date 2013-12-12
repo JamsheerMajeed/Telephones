@@ -31,8 +31,6 @@ public class ListenerImpl implements SerialPortEventListener {
     private final ScheduledExecutorService scheduler;
     private ScheduledFuture scheduledFuture;
 
-    private boolean running;
-
     /**
      * Initialize.
      */
@@ -78,7 +76,7 @@ public class ListenerImpl implements SerialPortEventListener {
             }
         } else {
             log.debug("Message Received" + Arrays.toString(input));
-            for (int x = 0; x < 1024; x++) {
+            for (int x = 0; x < BUFFER_SIZE; x++) {
                 if (input[x] == ETX) {
                     byte[] msg = Arrays.copyOfRange(input, 1, x + 1);
                     byte bcc = input[x + 1];
@@ -126,7 +124,7 @@ public class ListenerImpl implements SerialPortEventListener {
         switch (serialPortEvent.getEventType()) {
             case DATA_AVAILABLE:
                 try {
-                    Thread.sleep(40);
+                    Thread.sleep(150);
                 } catch (InterruptedException e) {
                     log.error("InterruptedException : ", e);
                 }
@@ -138,7 +136,7 @@ public class ListenerImpl implements SerialPortEventListener {
     /**
      * Buffer to hold the reading
      */
-    private byte[] readBuffer = new byte[1024];
+    private byte[] readBuffer = new byte[BUFFER_SIZE];
 
     private void readSerial() {
         try {
