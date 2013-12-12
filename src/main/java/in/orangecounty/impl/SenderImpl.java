@@ -89,7 +89,8 @@ public class SenderImpl implements ListenerSenderInterface, SenderInterface {
             selectSequenceSent = false;
             msgSent = false;
         } else {
-            log.error("Received Extra Ack We should not be here");
+            log.error("Received Extra Ack We should not be here but writing EOT anyway");
+            write(EOT);
         }
         //To change body of implemented methods use File | Settings | File Templates.
     }
