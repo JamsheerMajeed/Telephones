@@ -139,6 +139,7 @@ public class ListenerSerialEventImpl implements SerialPortEventListener {
         while(true){
             try {
                 readBuffer[index] = (byte) in.read();
+                log.debug("Read" + readBuffer[index]);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -153,6 +154,7 @@ public class ListenerSerialEventImpl implements SerialPortEventListener {
             } else if(readBuffer[index-1] == ETX){
                 break;
             }
+            index++;
         }
         return Arrays.copyOf(readBuffer, index);
     }
