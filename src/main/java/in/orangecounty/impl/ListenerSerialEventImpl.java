@@ -124,7 +124,11 @@ public class ListenerSerialEventImpl implements SerialPortEventListener {
         log.debug("Serial Event" + serialPortEvent);
         switch (serialPortEvent.getEventType()) {
             case DATA_AVAILABLE:
-                processMessage(readSerial());
+                log.debug("ReadBuffer Called");
+                byte[] msg = readSerial();
+                log.debug("Got Message " + Arrays.toString(msg));
+                processMessage(msg);
+                log.debug("Process Message Called");
                 break;
         }
     }
@@ -135,10 +139,13 @@ public class ListenerSerialEventImpl implements SerialPortEventListener {
 
 
     private byte[] readSerial() {
+        log.debug("In Read Serial");
         byte[] readBuffer = new byte[BUFFER_SIZE];
         int index = 0;
         while(true){
+            log.debug("In While Loop");
             try {
+                log.debug("Trying to Read from input Stream");
                 readBuffer[index] = (byte) in.read();
                 log.debug("Read" + readBuffer[index]);
             } catch (IOException e) {
@@ -157,6 +164,8 @@ public class ListenerSerialEventImpl implements SerialPortEventListener {
             }
             index++;
         }
-        return Arrays.copyOf(readBuffer, index);
+        byte[] rv =Arrays.copyOf(readBuffer, index);
+        log.debug("Returning from readSerial" + Arrays.toString(rv));
+        return rv;
     }
 }
