@@ -164,7 +164,7 @@ public class ListenerSerialEventImpl implements SerialPortEventListener {
             }
             index++;
         }
-        byte[] rv =Arrays.copyOf(readBuffer, index);
+        byte[] rv =Arrays.copyOf(readBuffer, index+1);
         log.debug("Returning from readSerial" + Arrays.toString(rv));
         return rv;
     }
