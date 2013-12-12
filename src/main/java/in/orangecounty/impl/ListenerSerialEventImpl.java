@@ -127,7 +127,7 @@ public class ListenerSerialEventImpl implements SerialPortEventListener {
                 log.debug("ReadBuffer Called");
                 byte[] msg = readSerial();
                 log.debug("Got Message " + Arrays.toString(msg));
-                processMessage(msg);
+                interpretMessage(msg);
                 log.debug("Process Message Called");
                 break;
         }
