@@ -4,6 +4,7 @@ import gnu.io.SerialPortEvent;
 import gnu.io.SerialPortEventListener;
 import in.orangecounty.ListenerSenderInterface;
 import in.orangecounty.Util;
+import org.apache.commons.lang.ArrayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,6 +31,7 @@ public class ListenerSerialEventImpl implements SerialPortEventListener {
     private ListenerSenderInterface sender;
     private final ScheduledExecutorService scheduler;
     private ScheduledFuture scheduledFuture;
+    private byte[] message;
 
     /**
      * Initialize.
@@ -46,37 +48,45 @@ public class ListenerSerialEventImpl implements SerialPortEventListener {
         if (input[0] == ACK) {
             log.debug("ACK Received");
             sender.ackReceived();
+            message = null;
         } else if (input[0] == NAK) {
             log.debug("NAK Received");
             sender.nakReceived();
+            message = null;
         } else if (input[0] == ENQ) {
             sender.sendEOT();
             log.error("ENQ Received.  We are not supposed to receive ENQ");
+            message = null;
         } else if (input[0] == EOT) {
             log.debug("EOT Received");
             stopTimer();
+            message = null;
         } else if (Arrays.equals(Arrays.copyOfRange(input, 0, 2), DLE_SEND)) {
             log.debug("Del Send Received");
             sender.interrupt();
             sender.sendEOT();
+            message = null;
         } else if (Arrays.equals(Arrays.copyOfRange(input, 0, 2), DLE_STOP)) {
             log.debug("Select Sequence Received");
             sender.interrupt();
             sender.sendEOT();
+            message = null;
         }
         if (Arrays.equals(Arrays.copyOfRange(input, 0, 3), SELECTING_SEQUENCE)) {
             log.debug("Select Sequence Received");
             if (sender.isSending()) {
                 log.debug("Select Sequence Conflict Branch");
                 sender.resendSelectSequence();
+                message = null;
             } else {
                 log.debug("Select Sequence Regular Branch");
                 sender.sendACK();
                 startTimer();
+                message = null;
             }
         } else {
             log.debug("Message Received" + Arrays.toString(input));
-            for (int x = 0; x < BUFFER_SIZE; x++) {
+            for (int x = 0; x < input.length-1; x++) {
                 if (input[x] == ETX) {
                     byte[] msg = Arrays.copyOfRange(input, 1, x + 1);
                     byte bcc = input[x + 1];
@@ -84,11 +94,13 @@ public class ListenerSerialEventImpl implements SerialPortEventListener {
                         sender.sendACK();
                         processMessage(msg);
                         stopTimer();
+                        message = null;
                     } else {
                         log.debug("BCC Check Failed");
                         sender.sendNAK();
                         stopTimer();
                     }
+                    message = null;
                     break;
                 }
             }
@@ -121,51 +133,29 @@ public class ListenerSerialEventImpl implements SerialPortEventListener {
 
     @Override
     public void serialEvent(SerialPortEvent serialPortEvent) {
+
         log.debug("Serial Event" + serialPortEvent);
         switch (serialPortEvent.getEventType()) {
             case DATA_AVAILABLE:
                 log.debug("ReadBuffer Called");
-                byte[] msg = readSerial();
-                log.debug("Got Message " + Arrays.toString(msg));
-                interpretMessage(msg);
+                message = ArrayUtils.addAll(message, read());
+                log.debug("Got Message " + Arrays.toString(message));
+                interpretMessage(message);
                 log.debug("Process Message Called");
                 break;
         }
     }
 
-    /**
-     * Buffer to hold the reading
-     */
-
-
-    private byte[] readSerial() {
-        log.debug("In Read Serial");
-        byte[] readBuffer = new byte[BUFFER_SIZE];
-        int index = 0;
-        while(true){
-            log.debug("In While Loop");
-            try {
-                log.debug("Trying to Read from input Stream");
-                readBuffer[index] = (byte) in.read();
-                log.debug("Read "+ readBuffer[index] + "Placed in Index" + index);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            if (readBuffer[0] == ACK || readBuffer[0] == NAK || readBuffer[0] == ENQ || readBuffer[0] == EOT) {
-                break;
-            } else if (Arrays.equals(Arrays.copyOfRange(readBuffer, 0, 2), DLE_SEND)) {
-                break;
-            } else if (Arrays.equals(Arrays.copyOfRange(readBuffer, 0, 2), DLE_STOP)) {
-                break;
-            } else if (Arrays.equals(Arrays.copyOfRange(readBuffer, 0, 3), SELECTING_SEQUENCE)) {
-                break;
-            } else if(readBuffer[index-1] == ETX){
-                break;
-            }
-            index++;
+    private byte[] read(){
+        byte[] rv = new byte[BUFFER_SIZE];
+        int len = 0;
+        try {
+            len = in.read(rv);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-        byte[] rv =Arrays.copyOf(readBuffer, index+1);
-        log.debug("Returning from readSerial" + Arrays.toString(rv));
-        return rv;
+        return Arrays.copyOf(rv, len);
     }
+
+
 }
