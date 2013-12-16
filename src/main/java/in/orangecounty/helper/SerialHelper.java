@@ -97,7 +97,7 @@ public class SerialHelper {
             serialPort.setSerialPortParams(
                     baudRate,
                     SerialPort.DATABITS_7,
-                    SerialPort.STOPBITS_2,
+                    SerialPort.STOPBITS_1,
                     SerialPort.PARITY_EVEN);
 
 //            serialPort.setFlowControlMode(SerialPort.FLOWCONTROL_NONE);
