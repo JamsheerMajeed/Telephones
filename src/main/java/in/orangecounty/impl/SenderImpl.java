@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Arrays;
 import java.util.concurrent.*;
 
 import static in.orangecounty.impl.Constants.*;
@@ -58,7 +59,7 @@ public class SenderImpl implements ListenerSenderInterface, SenderInterface {
     }
 
     private void write(byte[] payload) {
-        log.debug("Writing to Output : " + new String(payload));
+        log.debug("Writing to Output : " + new String(payload) + " : " + Arrays.toString(payload));
         try {
             os.write(payload);
             os.flush();
