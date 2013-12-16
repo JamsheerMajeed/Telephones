@@ -54,7 +54,7 @@ public class Constants {
      */
     public static final byte STC = 124;
 
-    public static final byte SA = 29;
+    public static final byte SA = 49;
 
     public static final byte UA = 33;
 
