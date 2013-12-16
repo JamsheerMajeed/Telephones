@@ -32,13 +32,14 @@ public class ListenerThreadImpl implements Runnable {
     }
 
     public void run(){
-        try {
-            buffer = ArrayUtils.add(buffer, (byte)in.read());
-            log.debug(Arrays.toString(buffer));
-        } catch (IOException e) {
-            e.printStackTrace();
+        while (true){
+            try {
+                buffer = ArrayUtils.add(buffer, (byte)in.read());
+                log.debug(Arrays.toString(buffer));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
-
     }
 
 }
