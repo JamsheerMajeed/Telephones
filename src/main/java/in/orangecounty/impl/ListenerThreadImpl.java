@@ -35,7 +35,7 @@ public class ListenerThreadImpl implements Runnable {
         while (true){
             try {
                 buffer = ArrayUtils.add(buffer, (byte)in.read());
-                log.debug(Arrays.toString(buffer));
+                log.debug(Arrays.toString(buffer) +":"+new String(buffer));
             } catch (IOException e) {
                 e.printStackTrace();
             }
