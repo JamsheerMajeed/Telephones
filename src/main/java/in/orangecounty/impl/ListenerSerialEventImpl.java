@@ -42,6 +42,23 @@ public class ListenerSerialEventImpl implements SerialPortEventListener {
         scheduler = Executors.newScheduledThreadPool(1);
     }
 
+    private void validateMessage(byte[] input) {
+        if (input != null &&
+                (input[0] != ACK ||
+                        input[0] != NAK ||
+                        input[0] != ENQ ||
+                        input[0] != EOT ||
+                        input[0] != DLE ||
+                        input[0] != STX
+                )
+                ) {
+            message = null;
+
+        } else {
+            interpretMessage(input);
+        }
+    }
+
 
     private void interpretMessage(byte[] input) {
         log.debug("Interpreting Message" + Arrays.toString(input));
@@ -86,7 +103,7 @@ public class ListenerSerialEventImpl implements SerialPortEventListener {
             }
         } else {
             log.debug("Message Received" + Arrays.toString(input));
-            for (int x = 0; x < input.length-1; x++) {
+            for (int x = 0; x < input.length - 1; x++) {
                 if (input[x] == ETX) {
                     byte[] msg = Arrays.copyOfRange(input, 1, x + 1);
                     byte bcc = input[x + 1];
@@ -140,13 +157,13 @@ public class ListenerSerialEventImpl implements SerialPortEventListener {
                 log.debug("ReadBuffer Called");
                 message = ArrayUtils.addAll(message, read());
                 log.debug("Got Message " + Arrays.toString(message));
-                interpretMessage(message);
+                validateMessage(message);
                 log.debug("Process Message Called");
                 break;
         }
     }
 
-    private byte[] read(){
+    private byte[] read() {
         byte[] rv = new byte[BUFFER_SIZE];
         int len = 0;
         try {
