@@ -90,7 +90,7 @@ public class SerialHelper {
      */
     protected void setSerialPortParameters() throws IOException {
 
-        final int baudRate = 300; // 1200bps
+        final int baudRate = 1200; // 1200bps
 
         try {
             // Set serial port to 57600bps-8N1..my favourite
@@ -100,7 +100,7 @@ public class SerialHelper {
                     SerialPort.STOPBITS_1,
                     SerialPort.PARITY_EVEN);
 
-            serialPort.setFlowControlMode(SerialPort.FLOWCONTROL_NONE);
+//            serialPort.setFlowControlMode(SerialPort.FLOWCONTROL_NONE);
         } catch (UnsupportedCommOperationException ex) {
             throw new IOException("Unsupported serial port parameter");
         }

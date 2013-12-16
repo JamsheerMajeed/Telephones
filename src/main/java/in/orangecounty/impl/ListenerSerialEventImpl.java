@@ -156,24 +156,15 @@ public class ListenerSerialEventImpl implements SerialPortEventListener {
         switch (serialPortEvent.getEventType()) {
             case DATA_AVAILABLE:
                 log.debug("ReadBuffer Called");
-                message = ArrayUtils.addAll(message, read());
+                try {
+                    message = ArrayUtils.add(message, (byte) in.read());
+                } catch (IOException e) {
+                    log.debug("IOException : ", e);
+                }
                 log.debug("Got Message " + Arrays.toString(message));
                 validateMessage(message);
                 log.debug("Process Message Called");
                 break;
         }
     }
-
-    private byte[] read() {
-        byte[] rv = new byte[BUFFER_SIZE];
-        int len = 0;
-        try {
-            len = in.read(rv);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return Arrays.copyOf(rv, len);
-    }
-
-
 }
