@@ -39,7 +39,7 @@ public class ListenerThreadImpl implements Runnable {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-        }
+            }
     }
 
 }
