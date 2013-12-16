@@ -24,6 +24,8 @@ public class ListenerThreadImpl {
     private final ScheduledExecutorService scheduler;
     private ScheduledFuture scheduledFuture;
     private ScheduledFuture timerScheduledFuture;
+    ExecutorService ex;
+    Future<byte[]> result;
     byte[] input = null;
 
     /**
@@ -33,6 +35,8 @@ public class ListenerThreadImpl {
         this.in = in;
         this.sender = sender;
         scheduler = Executors.newScheduledThreadPool(2);
+        ex = Executors.newSingleThreadExecutor();
+        result = ex.submit(new SerialInputReadTask());
         scheduledFuture = scheduler.scheduleAtFixedRate(new Runnable() {
             @Override
             public void run() {
@@ -123,11 +127,9 @@ public class ListenerThreadImpl {
     }
 
     private byte[] readInput() {
-        ExecutorService ex = Executors.newSingleThreadExecutor();
-        Future<byte[]> result = ex.submit(new SerialInputReadTask());
         byte[] input = null;
         try {
-            input = result.get(30, TimeUnit.MILLISECONDS);
+            input = result.get(100, TimeUnit.MILLISECONDS);
         } catch (ExecutionException e) {
             log.debug("ExecutionException : ", e);
             result.cancel(true);
@@ -150,6 +152,12 @@ public class ListenerThreadImpl {
         }
         if(scheduledFuture!=null){
             scheduledFuture.cancel(true);
+        }
+        if(result!=null){
+            result.cancel(true);
+        }
+        if(ex!=null){
+            ex.shutdown();
         }
         if(scheduler!=null){
             scheduler.shutdown();
