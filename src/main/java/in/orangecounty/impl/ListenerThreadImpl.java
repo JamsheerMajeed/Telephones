@@ -134,7 +134,7 @@ public class ListenerThreadImpl {
         } catch (TimeoutException e) {
 //            log.debug("Cancelling reading task");
             result.cancel(true);
-            log.debug("Thread cancelled. input is null");
+//            log.debug("Thread cancelled. input is null");
         } catch (InterruptedException e) {
             log.debug("InterruptedException", e);
             result.cancel(true);
