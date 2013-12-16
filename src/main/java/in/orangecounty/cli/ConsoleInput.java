@@ -39,10 +39,8 @@ public class ConsoleInput implements Runnable {
             log.debug("Listener Created");
             telephoneCommands = new TelephoneCommandImpl(sender);
             log.debug("Telephone Command Created");
-            serialHelper.addDataAvailableListener(listenerSerialEvent);
+//            serialHelper.addDataAvailableListener(listenerSerialEvent);
         } catch (IOException e) {
-            e.printStackTrace();
-        } catch (TooManyListenersException e) {
             e.printStackTrace();
         }
     }
