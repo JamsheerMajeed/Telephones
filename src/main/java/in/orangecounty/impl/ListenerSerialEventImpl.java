@@ -49,7 +49,8 @@ public class ListenerSerialEventImpl implements SerialPortEventListener {
                         input[0] != ENQ ||
                         input[0] != EOT ||
                         input[0] != DLE ||
-                        input[0] != STX
+                        input[0] != STX ||
+                        input[0] != SA
                 )
                 ) {
             message = null;
