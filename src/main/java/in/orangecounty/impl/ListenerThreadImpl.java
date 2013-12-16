@@ -22,6 +22,7 @@ public class ListenerThreadImpl {
     private InputStream in;
     private ListenerSenderInterface sender;
     private final ScheduledExecutorService scheduler;
+    private ScheduledFuture scheduledFuture;
     private ScheduledFuture timerScheduledFuture;
     byte[] input = null;
 
@@ -32,7 +33,7 @@ public class ListenerThreadImpl {
         this.in = in;
         this.sender = sender;
         scheduler = Executors.newScheduledThreadPool(2);
-        ScheduledFuture scheduledFuture = scheduler.scheduleAtFixedRate(new Runnable() {
+        scheduledFuture = scheduler.scheduleAtFixedRate(new Runnable() {
             @Override
             public void run() {
                 input = ArrayUtils.addAll(input, readInput());
@@ -43,7 +44,7 @@ public class ListenerThreadImpl {
 
     private void interpretMessage(byte[] input) {
         if(input==null){
-            log.debug("Null Input Received");
+//            log.debug("Null Input Received");
             return;
         }
         log.debug("Interpreting Message" + Arrays.toString(input));
@@ -131,7 +132,7 @@ public class ListenerThreadImpl {
             log.debug("ExecutionException : ", e);
             result.cancel(true);
         } catch (TimeoutException e) {
-            log.debug("Cancelling reading task");
+//            log.debug("Cancelling reading task");
             result.cancel(true);
             log.debug("Thread cancelled. input is null");
         } catch (InterruptedException e) {
@@ -141,6 +142,18 @@ public class ListenerThreadImpl {
             ex.shutdownNow();
         }
         return input;
+    }
+
+    public void stop() {
+        if(timerScheduledFuture!=null){
+            timerScheduledFuture.cancel(true);
+        }
+        if(scheduledFuture!=null){
+            scheduledFuture.cancel(true);
+        }
+        if(scheduler!=null){
+            scheduler.shutdown();
+        }
     }
 
 

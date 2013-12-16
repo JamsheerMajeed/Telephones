@@ -20,6 +20,7 @@ public class ConsoleInput implements Runnable {
     private boolean running;
     private TelephoneCommands telephoneCommands;
     private SenderImpl sender;
+    private ListenerThreadImpl listenerThread;
     SerialHelper serialHelper;
 
     public void start() {
@@ -45,6 +46,9 @@ public class ConsoleInput implements Runnable {
         }
         if(telephoneCommands!=null){
             telephoneCommands.stop();
+        }
+        if(listenerThread!=null){
+            listenerThread.stop();
         }
         running = false;
     }
