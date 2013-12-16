@@ -90,7 +90,7 @@ public class SerialHelper {
      */
     protected void setSerialPortParameters() throws IOException {
 
-        final int baudRate = 1200; // 1200bps
+        final int baudRate = 300; // 1200bps
 
         try {
             // Set serial port to 57600bps-8N1..my favourite
