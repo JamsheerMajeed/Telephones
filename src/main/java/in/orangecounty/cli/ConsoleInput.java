@@ -2,6 +2,7 @@ package in.orangecounty.cli;
 
 import in.orangecounty.TelephoneCommands;
 import in.orangecounty.helper.SerialHelper;
+import in.orangecounty.impl.ListenerSerialEventImpl;
 import in.orangecounty.impl.ListenerThreadImpl;
 import in.orangecounty.impl.SenderImpl;
 import in.orangecounty.impl.TelephoneCommandImpl;
@@ -9,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.TooManyListenersException;
 import java.util.concurrent.*;
 
 /**
@@ -20,7 +22,7 @@ public class ConsoleInput implements Runnable {
     private boolean running;
     private TelephoneCommands telephoneCommands;
     private SenderImpl sender;
-    private ListenerThreadImpl listenerThread;
+    private ListenerSerialEventImpl listenerSerialEvent;
     SerialHelper serialHelper;
 
     public void start() {
@@ -31,11 +33,14 @@ public class ConsoleInput implements Runnable {
             log.debug("Serial Connect Called");
             sender = new SenderImpl(serialHelper.getSerialOutputStream());
             log.debug("Sender Created");
-            new ListenerThreadImpl(serialHelper.getSerialInputStream(), sender);
+            listenerSerialEvent = new ListenerSerialEventImpl(serialHelper.getSerialInputStream(), sender);
             log.debug("Listener Created");
             telephoneCommands = new TelephoneCommandImpl(sender);
             log.debug("Telephone Command Created");
+            serialHelper.addDataAvailableListener(listenerSerialEvent);
         } catch (IOException e) {
+            e.printStackTrace();
+        } catch (TooManyListenersException e) {
             e.printStackTrace();
         }
     }
@@ -47,9 +52,9 @@ public class ConsoleInput implements Runnable {
         if(telephoneCommands!=null){
             telephoneCommands.stop();
         }
-        if(listenerThread!=null){
-            listenerThread.stop();
-        }
+//        if(listenerThread!=null){
+//            listenerThread.stop();
+//        }
         running = false;
     }
 
