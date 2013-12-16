@@ -22,7 +22,7 @@ public class ConsoleInput implements Runnable {
     private boolean running;
     private TelephoneCommands telephoneCommands;
     private SenderImpl sender;
-    private ListenerSerialEventImpl listenerSerialEvent;
+    private ListenerThreadImpl listenerThread;
     SerialHelper serialHelper;
 
     public void start() {
@@ -33,7 +33,9 @@ public class ConsoleInput implements Runnable {
             log.debug("Serial Connect Called");
             sender = new SenderImpl(serialHelper.getSerialOutputStream());
             log.debug("Sender Created");
-            listenerSerialEvent = new ListenerSerialEventImpl(serialHelper.getSerialInputStream(), sender);
+            new Thread(new ListenerThreadImpl(serialHelper.getSerialInputStream(), sender)).start();
+//            l
+//            listenerSerialEvent = new ListenerSerialEventImpl(serialHelper.getSerialInputStream(), sender);
             log.debug("Listener Created");
             telephoneCommands = new TelephoneCommandImpl(sender);
             log.debug("Telephone Command Created");

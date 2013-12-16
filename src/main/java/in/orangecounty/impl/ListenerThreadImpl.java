@@ -17,7 +17,7 @@ import static in.orangecounty.impl.Constants.*;
  * ListenerThreadImpl
  * Created by thomas on 16/12/13.
  */
-public class ListenerThreadImpl {
+public class ListenerThreadImpl implements Runnable {
     Logger log = LoggerFactory.getLogger(ListenerSerialEventImpl.class);
     private InputStream in;
     private ListenerSenderInterface sender;
