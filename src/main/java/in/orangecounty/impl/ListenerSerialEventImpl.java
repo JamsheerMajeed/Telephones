@@ -147,7 +147,7 @@ public class ListenerSerialEventImpl implements SerialPortEventListener {
             try {
                 log.debug("Trying to Read from input Stream");
                 readBuffer[index] = (byte) in.read();
-                log.debug("Read" + readBuffer[index]);
+                log.debug("Read "+ readBuffer[index] + "Placed in Index" + index);
             } catch (IOException e) {
                 e.printStackTrace();
             }
