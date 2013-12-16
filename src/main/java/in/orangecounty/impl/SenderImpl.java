@@ -73,6 +73,7 @@ public class SenderImpl implements ListenerSenderInterface, SenderInterface {
         write(a);
     }
 
+    //[Console Input] DEBUG in.orangecounty.impl.SenderImpl - Writing to Output :
 
     @Override
     public void ackReceived() {
@@ -160,7 +161,7 @@ public class SenderImpl implements ListenerSenderInterface, SenderInterface {
 
     @Override
     public void sendEnq() {
-        write(ENQ);
+        write(new byte[]{ENQ});
     }
 
 
