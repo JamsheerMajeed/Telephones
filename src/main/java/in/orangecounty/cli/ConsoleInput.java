@@ -94,6 +94,9 @@ public class ConsoleInput implements Runnable {
         if (command.equals("exit")) {
             log.debug("Exit Called");
             stop();
+        } else if (command.equals("enq")) {
+            log.debug("enq Called");
+            sender.sendEnq();
         } else if (command.equals("fireCall")) {
             log.debug("fireCall Called");
         } else if (command.equals("activate")) {

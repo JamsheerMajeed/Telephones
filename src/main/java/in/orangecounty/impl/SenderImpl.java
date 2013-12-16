@@ -158,6 +158,12 @@ public class SenderImpl implements ListenerSenderInterface, SenderInterface {
         write(SELECTING_SEQUENCE);
     }
 
+    @Override
+    public void sendEnq() {
+        write(ENQ);
+    }
+
+
     private void startScheduler(final byte[] payload, final int tries) {
         ex = Executors.newSingleThreadScheduledExecutor();
         future = ex.scheduleAtFixedRate(new Runnable() {

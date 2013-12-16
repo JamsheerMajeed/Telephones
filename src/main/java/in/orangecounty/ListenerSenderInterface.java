@@ -23,5 +23,7 @@ public interface ListenerSenderInterface {
 
     public void interrupt();
 
-    void resendSelectSequence();
+    public void resendSelectSequence();
+
+    public void sendEnq();
 }
