@@ -42,4 +42,8 @@ public class ListenerThreadImpl implements Runnable {
             }
     }
 
+    public void resetBuffer(){
+        buffer = null;
+    }
+
 }
