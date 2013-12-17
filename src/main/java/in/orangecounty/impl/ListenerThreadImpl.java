@@ -31,18 +31,19 @@ public class ListenerThreadImpl implements Runnable {
         this.sender = sender;
     }
 
-    public void run(){
-        while (true){
+    public void run() {
+        log.debug("ListenerThreadImpl Run Called");
+        while (true) {
             try {
-                buffer = ArrayUtils.add(buffer, (char)in.read());
-                log.debug(Arrays.toString(buffer) +":"+new String(buffer));
+                buffer = ArrayUtils.add(buffer, (char) in.read());
+                log.debug(Arrays.toString(buffer) + ":" + new String(buffer));
             } catch (IOException e) {
-                e.printStackTrace();
+                log.debug("IOException : ", e);
             }
-            }
+        }
     }
 
-    public void resetBuffer(){
+    public void resetBuffer() {
         buffer = null;
     }
 
