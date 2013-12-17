@@ -33,8 +33,8 @@ public class ConsoleInput implements Runnable {
             log.debug("Serial Connect Called");
             sender = new SenderImpl(serialHelper.getSerialOutputStream());
             log.debug("Sender Created");
-            new Thread(new ListenerThreadImpl(serialHelper.getSerialInputStream(), sender)).start();
-//            l
+            listenerThread = new ListenerThreadImpl(serialHelper.getSerialInputStream(), sender);
+            new Thread(listenerThread).start();
 //            listenerSerialEvent = new ListenerSerialEventImpl(serialHelper.getSerialInputStream(), sender);
             log.debug("Listener Created");
             telephoneCommands = new TelephoneCommandImpl(sender);

@@ -114,8 +114,8 @@ public class SerialHelper {
     public void addDataAvailableListener(SerialPortEventListener dataAvailableListener)
             throws TooManyListenersException {
         // Add the serial port event listener
-        serialPort.addEventListener(dataAvailableListener);
         serialPort.notifyOnDataAvailable(true);
+        serialPort.addEventListener(dataAvailableListener);
     }
 
     /**

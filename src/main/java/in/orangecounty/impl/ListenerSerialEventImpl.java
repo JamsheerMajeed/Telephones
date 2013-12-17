@@ -151,20 +151,12 @@ public class ListenerSerialEventImpl implements SerialPortEventListener {
 
     @Override
     public void serialEvent(SerialPortEvent serialPortEvent) {
-
-        log.debug("Serial Event" + serialPortEvent);
-        switch (serialPortEvent.getEventType()) {
-            case DATA_AVAILABLE:
-                log.debug("ReadBuffer Called");
-                try {
-                    message = ArrayUtils.add(message, (byte) in.read());
-                } catch (IOException e) {
-                    log.debug("IOException : ", e);
-                }
-                log.debug("Got Message " + Arrays.toString(message));
-                validateMessage(message);
-                log.debug("Process Message Called");
-                break;
+        try {
+            message = ArrayUtils.add(message, (byte) in.read());
+        } catch (IOException e) {
+            log.debug("IOException : ", e);
         }
+        log.debug("Got Message " + Arrays.toString(message));
+        validateMessage(message);
     }
 }

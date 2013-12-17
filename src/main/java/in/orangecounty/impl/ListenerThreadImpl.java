@@ -21,7 +21,7 @@ public class ListenerThreadImpl implements Runnable {
     Logger log = LoggerFactory.getLogger(ListenerSerialEventImpl.class);
     private InputStream in;
     private ListenerSenderInterface sender;
-    byte[] buffer;
+    char[] buffer;
 
     /**
      * Initialize.
@@ -34,7 +34,7 @@ public class ListenerThreadImpl implements Runnable {
     public void run(){
         while (true){
             try {
-                buffer = ArrayUtils.add(buffer, (byte)in.read());
+                buffer = ArrayUtils.add(buffer, (char)in.read());
                 log.debug(Arrays.toString(buffer) +":"+new String(buffer));
             } catch (IOException e) {
                 e.printStackTrace();
