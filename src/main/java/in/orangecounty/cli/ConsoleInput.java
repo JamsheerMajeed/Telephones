@@ -1,15 +1,19 @@
 package in.orangecounty.cli;
 
+import gnu.io.*;
+import in.orangecounty.ListenerInterface;
 import in.orangecounty.TelephoneCommands;
-import in.orangecounty.helper.SerialHelper;
 import in.orangecounty.impl.ListenerSerialEventImpl;
-import in.orangecounty.impl.ListenerThreadImpl;
+//import in.orangecounty.helper.SerialHelper;
+//import in.orangecounty.impl.ListenerThreadImpl;
 import in.orangecounty.impl.SenderImpl;
 import in.orangecounty.impl.TelephoneCommandImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.TooManyListenersException;
 import java.util.concurrent.*;
 
@@ -19,37 +23,45 @@ import java.util.concurrent.*;
  */
 public class ConsoleInput implements Runnable {
     Logger log = LoggerFactory.getLogger(ConsoleInput.class);
+    SerialPort serialPort;
     private boolean running;
     private TelephoneCommands telephoneCommands;
+    ListenerSerialEventImpl listenerSerialEvent;
+    OutputStream outputStream;
+    InputStream inputStream;
     private SenderImpl sender;
-    private ListenerThreadImpl listenerThread;
-    SerialHelper serialHelper;
+    private ListenerInterface listener;
+//    private ListenerThreadImpl listenerThread;
+//    SerialHelper serialHelper;
 
     public void start() {
+        connect();
+//            serialHelper = new SerialHelper();
+//            log.debug("Serial Helper Created");
+//            serialHelper.connect("/dev/ttyS0");
+//            log.debug("Serial Connect Called");
+        sender = new SenderImpl(outputStream);
+        log.debug("Sender Created");
+//        listenerThread = new ListenerThreadImpl(inputStream, sender);
+//        new Thread(listenerThread).start();
+            listenerSerialEvent = new ListenerSerialEventImpl(inputStream, sender);
+            listener = listenerSerialEvent;
         try {
-            serialHelper = new SerialHelper();
-            log.debug("Serial Helper Created");
-            serialHelper.connect("/dev/ttyS0");
-            log.debug("Serial Connect Called");
-            sender = new SenderImpl(serialHelper.getSerialOutputStream());
-            log.debug("Sender Created");
-            listenerThread = new ListenerThreadImpl(serialHelper.getSerialInputStream(), sender);
-            new Thread(listenerThread).start();
-//            listenerSerialEvent = new ListenerSerialEventImpl(serialHelper.getSerialInputStream(), sender);
-            log.debug("Listener Created");
-            telephoneCommands = new TelephoneCommandImpl(sender);
-            log.debug("Telephone Command Created");
-//            serialHelper.addDataAvailableListener(listenerSerialEvent);
-        } catch (IOException e) {
+            serialPort.addEventListener(listenerSerialEvent);
+        } catch (TooManyListenersException e) {
             e.printStackTrace();
         }
+        log.debug("Listener Created");
+        telephoneCommands = new TelephoneCommandImpl(sender);
+        log.debug("Telephone Command Created");
+//            serialHelper.addDataAvailableListener(listenerSerialEvent);
     }
 
     private void stop() {
-        if(sender!=null){
+        if (sender != null) {
             sender.stop();
         }
-        if(telephoneCommands!=null){
+        if (telephoneCommands != null) {
             telephoneCommands.stop();
         }
 //        if(listenerThread!=null){
@@ -110,7 +122,7 @@ public class ConsoleInput implements Runnable {
             sender.sendNAK();
         } else if (command.equals("resetbuf")) {
             log.debug("resetbuf Called");
-            listenerThread.resetBuffer();
+            listener.resetBuffer();
         } else if (command.equals("fireCall")) {
             log.debug("fireCall Called");
         } else if (command.equals("activate")) {
@@ -127,6 +139,35 @@ public class ConsoleInput implements Runnable {
         }
     }
 
+    private void connect() {
+        try {
+            CommPortIdentifier portIdentifier = CommPortIdentifier.getPortIdentifier("/dev/ttyS0");
+            if (portIdentifier.isCurrentlyOwned()) {
+                log.error("Port In Use");
+            } else {
+                // points who owns the port and connection timeout
+                serialPort = (SerialPort) portIdentifier.open("TelApp", 2000);
+                // setup connection parameters
+                serialPort.setSerialPortParams(
+                        1200,
+                        SerialPort.DATABITS_7,
+                        SerialPort.STOPBITS_1,
+                        SerialPort.PARITY_EVEN);
+                serialPort.notifyOnDataAvailable(true);
+                outputStream = serialPort.getOutputStream();
+                inputStream = serialPort.getInputStream();
+            }
+        } catch (PortInUseException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (NoSuchPortException e) {
+            e.printStackTrace();
+        } catch (UnsupportedCommOperationException e) {
+            e.printStackTrace();
+        }
+    }
+
     private void printMessage() {
         System.out.println("Possible Commands:\n exit\n activate\n deactivate\n statusenq");
     }
@@ -136,7 +177,6 @@ public class ConsoleInput implements Runnable {
         Thread thread = new Thread(consoleInput, "Console Input");
         thread.start();
     }
-
 
 
 }

@@ -35,8 +35,9 @@ public class ListenerThreadImpl implements Runnable {
     public void run() {
         log.debug("ListenerThreadImpl Run Called");
         while (true) {
+
             try {
-                int byteCount =  in.available();
+                int byteCount =  in.read();
                 if (byteCount > 0) {
                     log.debug(String.format("%d bytes available for read", byteCount));
                     buffer = new byte[byteCount];

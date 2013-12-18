@@ -2,6 +2,7 @@ package in.orangecounty.impl;
 
 import gnu.io.SerialPortEvent;
 import gnu.io.SerialPortEventListener;
+import in.orangecounty.ListenerInterface;
 import in.orangecounty.ListenerSenderInterface;
 import in.orangecounty.Util;
 import org.apache.commons.lang.ArrayUtils;
@@ -25,7 +26,7 @@ import static in.orangecounty.impl.Constants.*;
  * Modified on: 29/11/13
  * Modified at: 11:53 AM
  */
-public class ListenerSerialEventImpl implements SerialPortEventListener {
+public class ListenerSerialEventImpl implements SerialPortEventListener, ListenerInterface {
     Logger log = LoggerFactory.getLogger(ListenerSerialEventImpl.class);
     private InputStream in;
     private ListenerSenderInterface sender;
@@ -158,5 +159,10 @@ public class ListenerSerialEventImpl implements SerialPortEventListener {
         }
         log.debug("Got Message " + Arrays.toString(message));
         validateMessage(message);
+    }
+
+    @Override
+    public void resetBuffer() {
+        message = null;
     }
 }
