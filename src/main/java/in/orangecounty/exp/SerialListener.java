@@ -35,11 +35,10 @@ public class SerialListener implements SerialPortEventListener {
             case(SerialPortEvent.DATA_AVAILABLE):
                 log.debug("Data Available Event Received");
                 try {
-                    int x = inputStream.read();
-                    buffer = ArrayUtils.add(buffer, (byte)x);
-                    if(x == 6){
-                        sender.ackReceived();
-                    }
+                    byte[] buff = new byte[100];
+                    int readBytes = inputStream.read(buff);
+                    buff = Arrays.copyOf(buff, readBytes);
+                    buffer = ArrayUtils.addAll(buffer, buff);
                     log.debug("String:" + new String(buffer, "UTF-8"));
                     log.debug("Value:" + Arrays.toString(buffer));
                 } catch (IOException e) {

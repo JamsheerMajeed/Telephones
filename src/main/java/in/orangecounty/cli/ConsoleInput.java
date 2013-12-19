@@ -91,6 +91,7 @@ public class ConsoleInput implements Runnable {
                     log.debug("InterruptedException", e);
                     break;
                 }
+                Thread.yield();
             }
         } finally {
             ex.shutdownNow();
