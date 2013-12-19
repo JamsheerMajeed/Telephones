@@ -26,15 +26,16 @@ public class SerialListener implements SerialPortEventListener {
 
     @Override
     public void serialEvent(SerialPortEvent ev) {
-        log.debug("Serial Event Received :" + ev);
+        log.debug("Serial Event Received :" + ev.getEventType());
         switch (ev.getEventType()){
             case(SerialPortEvent.DATA_AVAILABLE):
+                log.debug("Data Available Event Received");
                 try {
                     ArrayUtils.add(buffer, (char)inputStream.read());
                     log.debug("String:" + new String(buffer));
                     log.debug("Value:" + Arrays.toString(buffer));
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    log.error("IOException : ", e);
                 }
                 break;
             case(SerialPortEvent.CTS):
