@@ -21,7 +21,7 @@ public class SerialListener implements SerialPortEventListener {
     Logger log = LoggerFactory.getLogger(SerialListener.class);
     InputStream inputStream;
     SenderImpl sender;
-    byte[] buffer;
+    StringBuilder buffer = new StringBuilder();
 
     public SerialListener(InputStream inputStream, SenderImpl sender) {
         this.inputStream = inputStream;
@@ -35,12 +35,13 @@ public class SerialListener implements SerialPortEventListener {
             case(SerialPortEvent.DATA_AVAILABLE):
                 log.debug("Data Available Event Received");
                 try {
-                    byte[] buff = new byte[100];
-                    int readBytes = inputStream.read(buff);
-                    buff = Arrays.copyOf(buff, readBytes);
-                    buffer = ArrayUtils.addAll(buffer, buff);
-                    log.debug("String:" + new String(buffer, "UTF-8"));
-                    log.debug("Value:" + Arrays.toString(buffer));
+                    int x = inputStream.read();
+                    buffer.append((char)x);
+                    if(x == 6){
+                        sender.ackReceived();
+                    }
+                    log.debug("String:" + buffer.toString());
+                    log.debug("Value:" + Arrays.toString(buffer.toString().getBytes()));
                 } catch (IOException e) {
                     log.error("IOException : ", e);
                 }
