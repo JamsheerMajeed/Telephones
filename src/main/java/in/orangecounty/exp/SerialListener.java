@@ -25,6 +25,7 @@ public class SerialListener implements SerialPortEventListener {
 
     @Override
     public void serialEvent(SerialPortEvent ev) {
+        log.debug("Serial Event Received");
         try {
             ArrayUtils.add(buffer, (char)inputStream.read());
             log.debug("String:" + new String(buffer));
