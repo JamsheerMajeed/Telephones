@@ -3,9 +3,7 @@ package in.orangecounty.cli;
 import gnu.io.*;
 import in.orangecounty.ListenerInterface;
 import in.orangecounty.TelephoneCommands;
-import in.orangecounty.impl.ListenerSerialEventImpl;
-//import in.orangecounty.helper.SerialHelper;
-//import in.orangecounty.impl.ListenerThreadImpl;
+import in.orangecounty.exp.SerialListener;
 import in.orangecounty.impl.SenderImpl;
 import in.orangecounty.impl.TelephoneCommandImpl;
 import org.slf4j.Logger;
@@ -26,7 +24,6 @@ public class ConsoleInput implements Runnable {
     SerialPort serialPort;
     private boolean running;
     private TelephoneCommands telephoneCommands;
-    ListenerSerialEventImpl listenerSerialEvent;
     OutputStream outputStream;
     InputStream inputStream;
     private SenderImpl sender;
@@ -42,12 +39,9 @@ public class ConsoleInput implements Runnable {
 //            log.debug("Serial Connect Called");
         sender = new SenderImpl(outputStream);
         log.debug("Sender Created");
-//        listenerThread = new ListenerThreadImpl(inputStream, sender);
-//        new Thread(listenerThread).start();
-            listenerSerialEvent = new ListenerSerialEventImpl(inputStream, sender);
-            listener = listenerSerialEvent;
+        SerialListener serialListener = new SerialListener(inputStream);
         try {
-            serialPort.addEventListener(listenerSerialEvent);
+            serialPort.addEventListener(serialListener);
         } catch (TooManyListenersException e) {
             e.printStackTrace();
         }
