@@ -39,7 +39,7 @@ public class ConsoleInput implements Runnable {
 //            log.debug("Serial Connect Called");
         sender = new SenderImpl(outputStream);
         log.debug("Sender Created");
-        SerialListener serialListener = new SerialListener(inputStream);
+        SerialListener serialListener = new SerialListener(inputStream, sender);
         try {
             serialPort.removeEventListener();
             serialPort.addEventListener(serialListener);

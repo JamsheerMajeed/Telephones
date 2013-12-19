@@ -3,6 +3,7 @@ package in.orangecounty.exp;
 import gnu.io.SerialPort;
 import gnu.io.SerialPortEvent;
 import gnu.io.SerialPortEventListener;
+import in.orangecounty.impl.SenderImpl;
 import org.apache.commons.lang.ArrayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,6 +12,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Arrays;
+import static in.orangecounty.impl.Constants.*;
 
 /**
  * Created by thomas on 19/12/13.
@@ -18,10 +20,12 @@ import java.util.Arrays;
 public class SerialListener implements SerialPortEventListener {
     Logger log = LoggerFactory.getLogger(SerialListener.class);
     InputStream inputStream;
+    SenderImpl sender;
     char[] buffer;
 
-    public SerialListener(InputStream inputStream) {
+    public SerialListener(InputStream inputStream, SenderImpl sender) {
         this.inputStream = inputStream;
+        this.sender = sender;
     }
 
     @Override
@@ -31,7 +35,11 @@ public class SerialListener implements SerialPortEventListener {
             case(SerialPortEvent.DATA_AVAILABLE):
                 log.debug("Data Available Event Received");
                 try {
-                    buffer = ArrayUtils.add(buffer, (char)inputStream.read());
+                    int x = inputStream.read();
+                    buffer = ArrayUtils.add(buffer, (char)x);
+                    if(x == 6){
+                        sender.ackReceived();
+                    }
                     log.debug("String:" + new String(buffer));
                     log.debug("Value:" + Arrays.toString(buffer));
                 } catch (IOException e) {
