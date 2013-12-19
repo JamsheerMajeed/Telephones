@@ -2,18 +2,17 @@ package in.orangecounty.impl;
 
 import in.orangecounty.SenderInterface;
 import in.orangecounty.TelephoneCommands;
-import org.apache.commons.lang.ArrayUtils;
-import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Queue;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
-import static in.orangecounty.impl.Constants.*;
 
 /**
  * User: thomas
@@ -25,13 +24,11 @@ public class TelephoneCommandImpl implements TelephoneCommands {
     private static final String STATUS_ENQUIRY = "\u00021!L7007F  \u0003\u0019";
 
 
-    private boolean running = true;
     private SenderInterface sender;
+    private final Object messageReadFlag = new Object();
     private Queue<byte[]> messages = new LinkedList<byte[]>();
     private final ScheduledExecutorService scheduler;
     private ScheduledFuture scheduledFuture;
-
-
 
 
     public TelephoneCommandImpl(SenderInterface sender) {
@@ -42,17 +39,17 @@ public class TelephoneCommandImpl implements TelephoneCommands {
             public void run() {
                 sendMessages();
             }
-        },0,1,TimeUnit.SECONDS);
+        }, 0, 1, TimeUnit.SECONDS);
     }
 
     private void sendMessages() {
         int count = 0;
-        while(!messages.isEmpty()){
-            synchronized (messages) {
+        while (!messages.isEmpty()) {
+            synchronized (messageReadFlag) {
                 if (sender.sendMessage(messages.peek())) {
                     messages.poll();
                 } else {
-                    if(count > 10){
+                    if (count > 10) {
                         break;
                     }
                     count++;
@@ -65,7 +62,7 @@ public class TelephoneCommandImpl implements TelephoneCommands {
     public void checkIn(String extensionNumber, String guestName) {
         log.debug("checkIn Called");
         byte[] msg = parseActivateExtension(reSizeExtensionNumber(extensionNumber), reSizeGuestName(guestName));
-        synchronized (messages) {
+        synchronized (messageReadFlag) {
             messages.add(msg);
         }
     }
@@ -77,9 +74,9 @@ public class TelephoneCommandImpl implements TelephoneCommands {
 
     @Override
     public void sync(HashMap<String, String> extensions) {
-        //TODO Implement Sync Properly.
-        log.debug("Sync Called" + extensions);
+
     }
+
 
     @Override
     public void statusEnquiry() {
@@ -88,80 +85,48 @@ public class TelephoneCommandImpl implements TelephoneCommands {
 
     @Override
     public void stop() {
-        if(scheduledFuture!=null){
+        if (scheduledFuture != null) {
             scheduledFuture.cancel(true);
         }
-        if(scheduler!=null){
-            scheduler.shutdown();
-        }
+        scheduler.shutdown();
     }
 
-    /**
-     * A
-     *
-     * @param extensionNumber
-     * @param guestName
-     * @return
-     */
-    protected byte[] parseActivateExtension(String extensionNumber, String guestName) {
-        log.debug("parseActivateExtension Called");
-        // Standard Header STX, SA, UA
-        byte[] msg = new byte[]{STX, SA, UA};
-        //Adding the Entry Index "L", Feature Code Index "16", Message Counter "11", Function Code "B"
-        msg = ArrayUtils.addAll(msg, "L1634B".getBytes());
-        //Adding the Extension Number
-        msg = ArrayUtils.addAll(msg, rightPad(extensionNumber, 4).getBytes());
-        //Adding Unused Spaces, Language "2" for English and Rook Occupancy "1"
-        msg = ArrayUtils.addAll(msg, "        21".getBytes());
-        //Adding Guest Name
-        msg = ArrayUtils.addAll(msg, rightPad(guestName, 15).getBytes());
-        //Adding End of Transmission
-        msg = ArrayUtils.addAll(msg, new byte[]{ETX});
-        //Adding and returning lrc to the message
-        return ArrayUtils.add(msg, lrc(msg));
+    public byte[] parseActivateExtension(String extensionNumber, String guestName) {
+        guestName = reSizeGuestName(guestName);
+        extensionNumber = reSizeExtensionNumber(extensionNumber);
+        String message = "\u00021!L1634B" + extensionNumber + "        21" + guestName + "\u0003";
+        message = message + (char) lrc(message);
+        return message.getBytes();
     }
 
-    private byte[] parseDeActivateExtension(String extensionNumber) {
-        // Standard Header STX, SA, UA
-        byte[] msg = new byte[]{STX, SA, UA};
-        //Adding the Entry Index "L"
-        msg = ArrayUtils.addAll(msg, "L".getBytes());
-        //Adding the Feature Code Index "16"
-        msg = ArrayUtils.addAll(msg, "16".getBytes());
-        //Adding the Message Counter "11"
-        msg = ArrayUtils.addAll(msg, "11".getBytes());
-        //Adding the Function Code "2" (For checkout)
-        msg = ArrayUtils.addAll(msg, "2".getBytes());
-        //Adding the Extension Number
-        msg = ArrayUtils.addAll(msg, rightPad(extensionNumber, 4).getBytes());
-        //Adding Unused Spaces and End of Transmission
-        msg = ArrayUtils.addAll(msg, new byte[]{32, 32, ETX});
-        //Adding and returning lrc to the message
-        return ArrayUtils.add(msg, lrc(Arrays.copyOfRange(msg, 1, msg.length)));
+    public byte[] parseDeActivateExtension(String extensionNumber) {
+        extensionNumber = reSizeExtensionNumber(extensionNumber);
+        String message = "\u00021!L16112" + extensionNumber + "  \u0003";
+        message = message + (char) lrc(message);
+        return message.getBytes();
     }
 
-//
-//    @Override
-//    public void statusEnquiry() {
-//        byte[] statusEnquiry = new byte[]{2, 49, 33, 76, 55, 48, 48, 55, 70, 32, 32, 3, 25};
-//        buffer.add(statusEnquiry);
-//    }
 
     private String reSizeExtensionNumber(String extensionNumber) {
-        return rightPad(extensionNumber, 4);
+        if (extensionNumber.length() < 4) {
+            int count = 4 - extensionNumber.length();
+            for (int j = 0; j < count; j++) {
+                extensionNumber = extensionNumber.concat(" ");
+            }
+        }
+        return extensionNumber;
     }
 
     private String reSizeGuestName(String guestName) {
-        return rightPad(guestName, 15);
-    }
-
-    public static String rightPad(String string, int size) {
-        int len = string.length();
-        if (len > size) {
-            return (StringUtils.substring(string, 0, size));
+        if (guestName.length() < 15) {
+            int count = 15 - guestName.length();
+            for (int i = 0; i < count; i++) {
+                guestName = guestName.concat(" ");
+            }
         } else {
-            return (StringUtils.rightPad(string, size, ' '));
+            guestName = guestName.substring(0, 15);
         }
+        return guestName;
     }
 
     private byte lrc(final String msg) {
@@ -171,13 +136,5 @@ public class TelephoneCommandImpl implements TelephoneCommands {
             lrc = (byte) (lrc ^ byteArray[x]);
         }
         return lrc;
-    }
-
-    private byte lrc(final byte[] msg) {
-        byte rv = 0;
-        for (byte item : msg) {
-            rv = (byte) (rv ^ item);
-        }
-        return rv;
     }
 }
