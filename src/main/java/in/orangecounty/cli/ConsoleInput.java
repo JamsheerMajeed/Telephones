@@ -41,6 +41,7 @@ public class ConsoleInput implements Runnable {
         log.debug("Sender Created");
         SerialListener serialListener = new SerialListener(inputStream);
         try {
+            serialPort.notifyOnDataAvailable(true);
             serialPort.addEventListener(serialListener);
         } catch (TooManyListenersException e) {
             e.printStackTrace();
@@ -136,6 +137,7 @@ public class ConsoleInput implements Runnable {
     }
 
     private void connect() {
+
         try {
             CommPortIdentifier portIdentifier = CommPortIdentifier.getPortIdentifier("/dev/ttyS0");
             if (portIdentifier.isCurrentlyOwned()) {
