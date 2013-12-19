@@ -41,6 +41,7 @@ public class ConsoleInput implements Runnable {
         log.debug("Sender Created");
         SerialListener serialListener = new SerialListener(inputStream);
         try {
+            serialPort.removeEventListener();
             serialPort.notifyOnDataAvailable(true);
             serialPort.notifyOnCTS(true);
             serialPort.addEventListener(serialListener);
