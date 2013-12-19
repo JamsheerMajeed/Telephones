@@ -58,6 +58,8 @@ public class ConsoleInput implements Runnable {
         if (telephoneCommands != null) {
             telephoneCommands.stop();
         }
+        serialPort.removeEventListener();
+        serialPort.close();
 //        if(listenerThread!=null){
 //            listenerThread.stop();
 //        }
