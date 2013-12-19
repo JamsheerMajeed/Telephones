@@ -124,7 +124,7 @@ public class SerialListener implements SerialPortEventListener {
                 }
                 break;
             default:
-                log.debug("Default Case: Doing nothing");
+                log.debug("Default Case Buffer:" + buffer.toString());
         }
 
     }
