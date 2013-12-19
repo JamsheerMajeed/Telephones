@@ -35,9 +35,4 @@ public class TelephoneCommandTest {
         }
     }
 
-    @Test
-    public void testRightPad() {
-        assert (TelephoneCommandImpl.rightPad("a", 4).equals("a   "));
-        assert (TelephoneCommandImpl.rightPad("abcdef", 4).equals("abcd"));
-    }
 }
