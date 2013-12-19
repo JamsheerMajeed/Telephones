@@ -42,6 +42,7 @@ public class ConsoleInput implements Runnable {
         SerialListener serialListener = new SerialListener(inputStream);
         try {
             serialPort.notifyOnDataAvailable(true);
+            serialPort.notifyOnCTS(true);
             serialPort.addEventListener(serialListener);
         } catch (TooManyListenersException e) {
             e.printStackTrace();
