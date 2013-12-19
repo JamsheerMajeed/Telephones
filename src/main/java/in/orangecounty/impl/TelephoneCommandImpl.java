@@ -22,12 +22,15 @@ import static in.orangecounty.impl.Constants.*;
  */
 public class TelephoneCommandImpl implements TelephoneCommands {
     Logger log = LoggerFactory.getLogger(TelephoneCommandImpl.class);
+    private static final String STATUS_ENQUIRY = "\u00021!L7007F  \u0003\u0019";
+
 
     private boolean running = true;
     private SenderInterface sender;
     private Queue<byte[]> messages = new LinkedList<byte[]>();
     private final ScheduledExecutorService scheduler;
     private ScheduledFuture scheduledFuture;
+
 
 
 
@@ -80,7 +83,7 @@ public class TelephoneCommandImpl implements TelephoneCommands {
 
     @Override
     public void statusEnquiry() {
-        sender.sendMessage(STATUS_ENQUIRY);
+        sender.sendMessage(STATUS_ENQUIRY.getBytes());
     }
 
     @Override

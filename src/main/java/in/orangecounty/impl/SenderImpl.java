@@ -23,6 +23,8 @@ import static in.orangecounty.impl.Constants.*;
  */
 public class SenderImpl implements ListenerSenderInterface, SenderInterface {
     final Logger log = LoggerFactory.getLogger(SenderImpl.class);
+    private static final String INIT = "\u0031\u0021\u0005";
+
     private byte[] currentMessage = null;
     private final Object receivingLock = new Object();
 
@@ -55,7 +57,7 @@ public class SenderImpl implements ListenerSenderInterface, SenderInterface {
         log.debug("Writing Selecting Sequence");
         selectSequenceSent = true;
         msgSent = false;
-        startScheduler(SELECTING_SEQUENCE, MAX_INIT_ATTEMPTS);
+        startScheduler(INIT.getBytes(), MAX_INIT_ATTEMPTS);
     }
 
     private void write(byte[] payload) {
