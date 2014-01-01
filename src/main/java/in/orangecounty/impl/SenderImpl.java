@@ -1,7 +1,5 @@
 package in.orangecounty.impl;
 
-import in.orangecounty.ListenerSenderInterface;
-import in.orangecounty.SenderInterface;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -10,7 +8,6 @@ import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.concurrent.*;
 
-import static in.orangecounty.impl.Constants.*;
 
 /**
  * User: Nagendra
@@ -21,9 +18,14 @@ import static in.orangecounty.impl.Constants.*;
  * Modified on: 25/11/13
  * Modified at: 7:17 PM
  */
-public class SenderImpl implements ListenerSenderInterface, SenderInterface {
+public class SenderImpl {
     final Logger log = LoggerFactory.getLogger(SenderImpl.class);
     private static final String INIT = "\u0031\u0021\u0005";
+    private final byte[] ACK = new byte[]{4};
+    private final byte[] ENQ = new byte[]{5};
+    private final byte[] EOT = new byte[]{6};
+    private final byte[] NAK = new byte[]{21};
+
 
     private byte[] currentMessage = null;
     private final Object receivingLock = new Object();
@@ -43,11 +45,11 @@ public class SenderImpl implements ListenerSenderInterface, SenderInterface {
     ScheduledExecutorService ex;
 
 
-    public SenderImpl(OutputStream op) {
+    protected SenderImpl(OutputStream op) {
         this.os = op;
     }
 
-    public void stop() {
+    protected void stop() {
         stopScheduler();
     }
 
@@ -78,8 +80,7 @@ public class SenderImpl implements ListenerSenderInterface, SenderInterface {
 
     //[Console Input] DEBUG in.orangecounty.impl.SenderImpl - Writing to Output :
 
-    @Override
-    public void ackReceived() {
+    protected void ackReceived() {
         log.debug("Ack Received Called");
         if (selectSequenceSent) {
             stopScheduler();
@@ -109,46 +110,39 @@ public class SenderImpl implements ListenerSenderInterface, SenderInterface {
         counter = 0;
     }
 
-    @Override
-    public void sendACK() {
+    protected void sendACK() {
         log.debug("Writing ACK");
         write(ACK);
     }
 
-    @Override
-    public void sendNAK() {
+    protected void sendNAK() {
         log.debug("Writing NAK");
         write(NAK);
     }
 
-    @Override
-    public void sendEOT() {
+    protected void sendEOT() {
         log.debug("Writing EOT");
         write(EOT);
     }
 
-    @Override
-    public void setReceiving(boolean receiving) {
+    protected void setReceiving(boolean receiving) {
         synchronized (receivingLock) {
             this.receiving = receiving;
         }
     }
 
-    @Override
-    public void nakReceived() {
+    protected void nakReceived() {
         log.debug("NAK Received ......");
         //TODO implement what has to be done when receiving a NAK
     }
 
-    @Override
-    public boolean isSending() {
+    protected boolean isSending() {
         boolean rv = msgSent || selectSequenceSent;
         log.debug("Is Sending:" + rv);
         return rv;
     }
 
-    @Override
-    public void interrupt() {
+    protected void interrupt() {
         log.debug("Interrupt Received");
         sendEOT();
         receiving = false;
@@ -156,15 +150,8 @@ public class SenderImpl implements ListenerSenderInterface, SenderInterface {
         msgSent = false;
     }
 
-    @Override
-    public void resendSelectSequence() {
-        log.debug("Resending Select Sequence");
-        write(SELECTING_SEQUENCE);
-    }
-
-    @Override
-    public void sendEnq() {
-        write(new byte[]{ENQ});
+    protected void sendEnq() {
+        write(ENQ);
     }
 
 
@@ -188,7 +175,7 @@ public class SenderImpl implements ListenerSenderInterface, SenderInterface {
         }, 0l, TIMER_1_TIME_INTERVAL, TimeUnit.MILLISECONDS);
     }
 
-    public boolean sendMessage(byte[] payload) {
+    protected boolean sendMessage(byte[] payload) {
         synchronized (receivingLock) {
             if (!receiving && !isSending()) {
                 currentMessage = payload;
@@ -200,8 +187,7 @@ public class SenderImpl implements ListenerSenderInterface, SenderInterface {
         }
     }
 
-    @Override
-    public boolean canSend() {
+    protected boolean canSend() {
         return !isSending() && !receiving;
     }
 

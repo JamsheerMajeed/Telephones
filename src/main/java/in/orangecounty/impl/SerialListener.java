@@ -1,27 +1,20 @@
-package in.orangecounty.exp;
+package in.orangecounty.impl;
 
-import gnu.io.SerialPort;
 import gnu.io.SerialPortEvent;
 import gnu.io.SerialPortEventListener;
-import in.orangecounty.impl.SenderImpl;
-import org.apache.commons.lang.ArrayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.Arrays;
 
 /**
+ * SerialListener
  * Created by thomas on 19/12/13.
  */
 public class SerialListener implements SerialPortEventListener {
     Logger log = LoggerFactory.getLogger(SerialListener.class);
-    /**
-     * Start of Transmission.
-     */
-    private static final int STX = 2;
+
     /**
      * End of Transmission.
      */
@@ -46,13 +39,6 @@ public class SerialListener implements SerialPortEventListener {
      * Permission to Send Char.
      */
     private static final int PSC = 60;
-    /**
-     * Stop Transmission Char.
-     */
-    private static final int STC = 124;
-    /**
-     * Initialize.
-     */
 
 
 
@@ -71,8 +57,13 @@ public class SerialListener implements SerialPortEventListener {
         switch (ev.getEventType()){
             case(SerialPortEvent.DATA_AVAILABLE):
                 log.debug("Data Available Event Received");
+                int dataGot;
+                byte[] readBuffer = new byte[1024];
                 try {
-                    process(inputStream.read());
+                    dataGot = inputStream.read(readBuffer);
+                    for(int x = 0; x<dataGot; x++){
+                        process(readBuffer[x]& 0xff);
+                    }
                 } catch (IOException e) {
                     log.error("IOException : ", e);
                 }
@@ -102,10 +93,12 @@ public class SerialListener implements SerialPortEventListener {
             case (ACK):
                 log.debug("ACK Case");
                 sender.ackReceived();
+                resetBuffer();
                 break;
             case (NAK):
                 log.warn("NAK Case");
                 sender.nakReceived();
+                resetBuffer();
                 break;
             case (ENQ):
                 log.warn("ENQ Case");

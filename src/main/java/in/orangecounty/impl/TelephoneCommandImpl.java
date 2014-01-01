@@ -1,12 +1,10 @@
 package in.orangecounty.impl;
 
-import in.orangecounty.SenderInterface;
-import in.orangecounty.TelephoneCommands;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -19,27 +17,44 @@ import java.util.concurrent.TimeUnit;
  * Date: 3/12/13
  * Time: 9:05 AM
  */
-public class TelephoneCommandImpl implements TelephoneCommands {
+public class TelephoneCommandImpl{
     Logger log = LoggerFactory.getLogger(TelephoneCommandImpl.class);
-    private static final String STATUS_ENQUIRY = "\u00021!L7007F  \u0003\u0019";
+    private final String MSG_70_F_CRC = "\u00021!L7007F  \u0003\u0019";
+    private final String MSG_70_F = "\u00021!L7007F  \u0003";
+    private final String MSG_70_3 = "\u00021!L70073  \u0003";
+    private final String MSG_70_4 = "\u00021!L70074  \u0003";
 
 
-    private SenderInterface sender;
+    private SenderImpl sender;
     private final Object messageReadFlag = new Object();
+    private final byte[] msg70FCrc = MSG_70_F_CRC.getBytes();
     private Queue<byte[]> messages = new LinkedList<byte[]>();
     private final ScheduledExecutorService scheduler;
-    private ScheduledFuture scheduledFuture;
+    private ScheduledFuture messageScheduledFuture;
+    private ScheduledFuture statusEnquiryScheduledFuture;
 
 
-    public TelephoneCommandImpl(SenderInterface sender) {
+    protected TelephoneCommandImpl(SenderImpl sender) {
         this.sender = sender;
-        scheduler = Executors.newScheduledThreadPool(1);
-        scheduledFuture = scheduler.scheduleAtFixedRate(new Runnable() {
+
+        scheduler = Executors.newScheduledThreadPool(2);
+        messageScheduledFuture = scheduler.scheduleAtFixedRate(new Runnable() {
             @Override
             public void run() {
                 sendMessages();
             }
         }, 0, 1, TimeUnit.SECONDS);
+
+        statusEnquiryScheduledFuture = scheduler.scheduleAtFixedRate(new Runnable() {
+            @Override
+            public void run() {
+                if(!messages.contains(msg70FCrc)){
+                    synchronized (messageReadFlag) {
+                        messages.add(msg70FCrc);
+                    }
+                }
+            }
+        }, 0, 55, TimeUnit.SECONDS);
     }
 
     private void sendMessages() {
@@ -58,52 +73,65 @@ public class TelephoneCommandImpl implements TelephoneCommands {
         }
     }
 
-    @Override
-    public void checkIn(String extensionNumber, String guestName) {
+    protected void checkIn(String extensionNumber, String guestName) {
         log.debug("checkIn Called");
-        byte[] msg = parseActivateExtension(reSizeExtensionNumber(extensionNumber), reSizeGuestName(guestName));
+        String msg = parseActivateExtension(reSizeExtensionNumber(extensionNumber), reSizeGuestName(guestName));
+        queueMessage(msg);
+    }
+
+    private void queueMessage(String message){
+        message = message + (char) lrc(message);
         synchronized (messageReadFlag) {
-            messages.add(msg);
+            messages.add(message.getBytes());
         }
     }
 
-    @Override
-    public void deActivateExtension(String extensionNumber) {
-        sender.sendMessage(parseDeActivateExtension(extensionNumber));
+    protected void checkOut(String extensionNumber) {
+        queueMessage(paresCheckOut(extensionNumber));
     }
 
-    @Override
-    public void sync(HashMap<String, String> extensions) {
+    protected void sync(Map<String, String> extensions) {
+        //Queue 70.3 Message
+        queueMessage(MSG_70_3);
+        // For Each Extension queue 17.B Message
+        for(String extension : extensions.keySet()){
+            queueMessage(parseRoomImage(extension, extensions.get(extension)));
 
+        }
+        //Queue 70.4 Message
+        queueMessage(MSG_70_4);
+    }
+
+    private String parseRoomImage(String extension, String name) {
+        String rv = null;
+        if(name != null){
+
+        } else {
+
+        }
+        return rv;
     }
 
 
-    @Override
-    public void statusEnquiry() {
-        sender.sendMessage(STATUS_ENQUIRY.getBytes());
-    }
-
-    @Override
-    public void stop() {
-        if (scheduledFuture != null) {
-            scheduledFuture.cancel(true);
+    protected void stop() {
+        if (messageScheduledFuture != null) {
+            messageScheduledFuture.cancel(true);
+        }
+        if (statusEnquiryScheduledFuture != null){
+            statusEnquiryScheduledFuture.cancel(true);
         }
         scheduler.shutdown();
     }
 
-    public byte[] parseActivateExtension(String extensionNumber, String guestName) {
+    private String parseActivateExtension(String extensionNumber, String guestName) {
         guestName = reSizeGuestName(guestName);
         extensionNumber = reSizeExtensionNumber(extensionNumber);
-        String message = "\u00021!L1634B" + extensionNumber + "        21" + guestName + "\u0003";
-        message = message + (char) lrc(message);
-        return message.getBytes();
+        return "\u00021!L1634B" + extensionNumber + "        21" + guestName + "\u0003";
     }
 
-    public byte[] parseDeActivateExtension(String extensionNumber) {
+    private String paresCheckOut(String extensionNumber) {
         extensionNumber = reSizeExtensionNumber(extensionNumber);
-        String message = "\u00021!L16112" + extensionNumber + "  \u0003";
-        message = message + (char) lrc(message);
-        return message.getBytes();
+        return "\u00021!L16112" + extensionNumber + "  \u0003";
     }
 
 
@@ -129,12 +157,18 @@ public class TelephoneCommandImpl implements TelephoneCommands {
         return guestName;
     }
 
-    private byte lrc(final String msg) {
+    private byte lrc(final byte[] msg){
         byte lrc = 0;
-        byte[] byteArray = msg.getBytes();
-        for (int x = 1; x < byteArray.length; x++) {
-            lrc = (byte) (lrc ^ byteArray[x]);
+        for (int x = 1; x < msg.length; x++) {
+            lrc = (byte) (lrc ^ msg[x]);
         }
         return lrc;
+
     }
+
+
+    private byte lrc(final String msg) {
+        return lrc(msg.getBytes());
+    }
+
 }

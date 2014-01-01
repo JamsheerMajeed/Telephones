@@ -1,19 +1,19 @@
 package in.orangecounty.cli;
 
-import gnu.io.*;
-import in.orangecounty.ListenerInterface;
-import in.orangecounty.TelephoneCommands;
-import in.orangecounty.exp.SerialListener;
-import in.orangecounty.impl.SenderImpl;
-import in.orangecounty.impl.TelephoneCommandImpl;
+import in.orangecounty.DriverController;
+import in.orangecounty.impl.DriverControllerImpl;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.TooManyListenersException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Created by thomas on 9/12/13.
@@ -21,52 +21,11 @@ import java.util.concurrent.*;
  */
 public class ConsoleInput implements Runnable {
     Logger log = LoggerFactory.getLogger(ConsoleInput.class);
-    SerialPort serialPort;
-    private boolean running;
-    private TelephoneCommands telephoneCommands;
-    OutputStream outputStream;
-    InputStream inputStream;
-    private SenderImpl sender;
-    private ListenerInterface listener;
-//    private ListenerThreadImpl listenerThread;
-//    SerialHelper serialHelper;
+    private boolean running = false;
+    DriverController driverController = new DriverControllerImpl();
 
-    public void start() {
-        connect();
-//            serialHelper = new SerialHelper();
-//            log.debug("Serial Helper Created");
-//            serialHelper.connect("/dev/ttyS0");
-//            log.debug("Serial Connect Called");
-        sender = new SenderImpl(outputStream);
-        log.debug("Sender Created");
-        SerialListener serialListener = new SerialListener(inputStream, sender);
-        try {
-            serialPort.removeEventListener();
-            serialPort.addEventListener(serialListener);
-            serialPort.notifyOnDataAvailable(true);
-            serialPort.notifyOnCTS(true);
-        } catch (TooManyListenersException e) {
-            e.printStackTrace();
-        }
-        log.debug("Listener Created");
-        telephoneCommands = new TelephoneCommandImpl(sender);
-        log.debug("Telephone Command Created");
-//            serialHelper.addDataAvailableListener(listenerSerialEvent);
-    }
-
-    private void stop() {
-        if (sender != null) {
-            sender.stop();
-        }
-        if (telephoneCommands != null) {
-            telephoneCommands.stop();
-        }
-        serialPort.removeEventListener();
-        serialPort.close();
-//        if(listenerThread!=null){
-//            listenerThread.stop();
-//        }
-        running = false;
+    private enum Command{
+        exit, checkin, checkout, sync, start;
     }
 
 
@@ -79,12 +38,11 @@ public class ConsoleInput implements Runnable {
                 Future<String> result = ex.submit(
                         new ConsoleInputReadTask());
                 try {
-                    input = result.get(10, TimeUnit.SECONDS);
+                    input = result.get(60, TimeUnit.SECONDS);
                     break;
                 } catch (ExecutionException e) {
                     e.getCause().printStackTrace();
                 } catch (TimeoutException e) {
-                    log.debug("Cancelling reading task");
                     result.cancel(true);
                     log.debug("Thread cancelled. input is null");
                 } catch (InterruptedException e) {
@@ -101,76 +59,71 @@ public class ConsoleInput implements Runnable {
 
     public void run() {
         running = true;
-        start();
+        driverController.start();
         while (running) {
             process(readLine());
         }
     }
 
-    private void process(String command) {
-        if (command.equals("exit")) {
-            log.debug("Exit Called");
-            stop();
-        } else if (command.equals("enq")) {
-            log.debug("enq Called");
-            sender.sendEnq();
-        } else if (command.equals("ack")) {
-            log.debug("Ack Called");
-            sender.sendACK();
-        } else if (command.equals("nak")) {
-            log.debug("Nak Called");
-            sender.sendNAK();
-        } else if (command.equals("resetbuf")) {
-            log.debug("resetbuf Called");
-            listener.resetBuffer();
-        } else if (command.equals("fireCall")) {
-            log.debug("fireCall Called");
-        } else if (command.equals("activate")) {
-            log.debug("activate Called");
-            telephoneCommands.checkIn("202", "Thomas");
-        } else if (command.equals("deactivate")) {
-            log.debug("deactivate Called");
-            telephoneCommands.deActivateExtension("202");
-        } else if (command.equals("statusenq")) {
-            log.debug("status Called");
-            telephoneCommands.statusEnquiry();
-        } else {
-            printMessage();
+    private void process(String input) {
+        List<String> list = new ArrayList<String>();
+        Matcher m = Pattern.compile("([^\"]\\S*|\".+?\")\\s*").matcher(input);
+        while (m.find()){
+            list.add(m.group(1).replace("\"", "")); // Add .replace("\"", "") to remove surrounding quotes.
         }
-    }
-
-    private void connect() {
-
+        Command command = null;
         try {
-            CommPortIdentifier portIdentifier = CommPortIdentifier.getPortIdentifier("/dev/ttyS0");
-            if (portIdentifier.isCurrentlyOwned()) {
-                log.error("Port In Use");
-            } else {
-                // points who owns the port and connection timeout
-                serialPort = (SerialPort) portIdentifier.open("TelApp", 2000);
-                // setup connection parameters
-                serialPort.setSerialPortParams(
-                        1200,
-                        SerialPort.DATABITS_7,
-                        SerialPort.STOPBITS_1,
-                        SerialPort.PARITY_EVEN);
-                serialPort.notifyOnDataAvailable(true);
-                outputStream = serialPort.getOutputStream();
-                inputStream = serialPort.getInputStream();
-            }
-        } catch (PortInUseException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (NoSuchPortException e) {
-            e.printStackTrace();
-        } catch (UnsupportedCommOperationException e) {
-            e.printStackTrace();
+            command = Command.valueOf(list.get(0));
+        } catch (IllegalArgumentException e) {
+            System.out.printf("\n%s is not a recognised command\n\n", list.get(0));
+            printMessage();
+            return;
+        }
+        switch(command){
+            case exit:
+                driverController.stop();
+                running = false;
+                break;
+            case checkin:
+                //Not Checking Input
+                if (list.size()>2) {
+                    driverController.checkIn(list.get(1), list.get(2));
+                } else {
+                    System.out.println("\nUsage: checkin <extension> <Guest Name>\n");
+                }
+                break;
+            case checkout:
+                if (list.size()>1) {
+                    driverController.checkOut(list.get(1));
+                } else {
+                    System.out.println("\nUsage: checkout <extension>\n");
+                }
+                break;
+            case sync:
+                Map<String, String> extensions = new HashMap<String, String>();
+                for(String item : list){
+                    if(item.matches("^[^:]+:[^:]+$")){
+                        String[] keyValue = item.split(":");
+                        extensions.put(keyValue[0], keyValue[1]);
+                    }
+                }
+                driverController.sync(extensions);
+                break;
+            case start:
+                driverController.start();
+                break;
+            default:
+                printMessage();
+                break;
         }
     }
 
     private void printMessage() {
-        System.out.println("Possible Commands:\n exit\n activate\n deactivate\n statusenq");
+        System.out.println("Possible Commands:");
+        for(Command c : Command.values()){
+            System.out.println(c.name());
+        }
+        System.out.println();
     }
 
     public static void main(String[] args) {

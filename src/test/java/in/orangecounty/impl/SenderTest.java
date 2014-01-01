@@ -1,6 +1,5 @@
 package in.orangecounty.impl;
 
-import in.orangecounty.ListenerSenderInterface;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -11,7 +10,6 @@ import java.io.*;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static in.orangecounty.impl.Constants.*;
 import static org.mockito.Mockito.*;
 
 /**
@@ -21,14 +19,19 @@ import static org.mockito.Mockito.*;
  */
 public class SenderTest {
     Logger log = LoggerFactory.getLogger(SenderTest.class);
-    ListenerSenderInterface listenerSenderInterface;
+    SenderImpl sender;
     SenderImpl si;
     OutputStream outputStream = mock(OutputStream.class);
+    private final byte[] SELECTING_SEQUENCE = "\u0031\u0021\u0005".getBytes();
+    private final byte[] ACK = new byte[]{4};
+    private final byte[] ENQ = new byte[]{5};
+    private final byte[] EOT = new byte[]{6};
+    private final byte[] NAK = new byte[]{21};
 
     @Before
     public void setup(){
         si = new SenderImpl(outputStream);
-        listenerSenderInterface = si;
+        sender = si;
     }
     @After
     public void tearDown(){
@@ -38,10 +41,9 @@ public class SenderTest {
 
     @Test
     public void testSendAck(){
-        listenerSenderInterface.sendACK();
+        sender.sendACK();
         try {
-            byte[] ackArray = new byte[]{ACK};
-            verify(outputStream).write(ackArray);
+            verify(outputStream).write(ACK);
             verify(outputStream).flush();
         } catch (IOException e) {
             log.debug("IOException :",e);
@@ -52,19 +54,18 @@ public class SenderTest {
     public void testActivateExtension(){
         byte[] expectedMessage = new byte[]{2, 49, 33, 76, 49, 54, 51, 52, 66, 50, 48, 50, 32, 32, 32, 32, 32, 32, 32, 32, 32, 50, 49, 84, 104, 111, 109, 97, 115, 32, 32, 32, 32, 32, 32, 32, 32, 32, 3, 2};
         si.sendMessage(expectedMessage);
-        assertTrue(listenerSenderInterface.isSending());
+        assertTrue(sender.isSending());
         try {
             Thread.sleep(10);
             verify(outputStream).write(SELECTING_SEQUENCE);
-            assertTrue(listenerSenderInterface.isSending());
-            listenerSenderInterface.ackReceived();
+            assertTrue(sender.isSending());
+            sender.ackReceived();
             Thread.sleep(10);
             verify(outputStream).write(expectedMessage);
-            listenerSenderInterface.ackReceived();
-            assertFalse(listenerSenderInterface.isSending());
-            byte[] eotArray = new byte[]{EOT};
+            sender.ackReceived();
+            assertFalse(sender.isSending());
             Thread.sleep(10);
-            verify(outputStream).write(eotArray);
+            verify(outputStream).write(EOT);
         } catch (IOException e) {
             log.debug("IOException", e);
         } catch (InterruptedException e) {
@@ -93,11 +94,10 @@ public class SenderTest {
         si.sendMessage(expectedMessage);
         try {
             Thread.sleep(100);
-            listenerSenderInterface.ackReceived();
+            sender.ackReceived();
             Thread.sleep(33000);
             verify(outputStream, atLeast(32)).write(expectedMessage);
-            byte[] eotArray = new byte[]{EOT};
-            verify(outputStream).write(eotArray);
+            verify(outputStream).write(EOT);
         } catch (InterruptedException e) {
             log.error("InterruptedException", e);
         } catch (IOException e) {

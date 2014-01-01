@@ -1,6 +1,5 @@
 package in.orangecounty.impl;
 
-import in.orangecounty.SenderInterface;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -14,11 +13,11 @@ import static org.mockito.Mockito.*;
  */
 public class TelephoneCommandTest {
     TelephoneCommandImpl telephoneCommand;
-    SenderInterface sender;
+    SenderImpl sender;
 
     @Before
     public void setup() {
-        sender = mock(SenderInterface.class);
+        sender = mock(SenderImpl.class);
         telephoneCommand = new TelephoneCommandImpl(sender);
     }
 
