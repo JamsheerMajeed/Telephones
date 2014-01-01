@@ -21,9 +21,9 @@ import java.util.concurrent.*;
 public class SenderImpl {
     final Logger log = LoggerFactory.getLogger(SenderImpl.class);
     private static final String INIT = "\u0031\u0021\u0005";
-    private final byte[] ACK = new byte[]{4};
+    private final byte[] ACK = new byte[]{6};
     private final byte[] ENQ = new byte[]{5};
-    private final byte[] EOT = new byte[]{6};
+    private final byte[] EOT = new byte[]{4};
     private final byte[] NAK = new byte[]{21};
 
 
