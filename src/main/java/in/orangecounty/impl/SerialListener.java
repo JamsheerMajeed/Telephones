@@ -109,6 +109,7 @@ public class SerialListener implements SerialPortEventListener {
             case (EOT):
                 log.debug("EOT Case");
                 sender.setReceiving(false);
+                resetBuffer();
                 break;
             case (PSC):
                 log.debug("PSC Case");
