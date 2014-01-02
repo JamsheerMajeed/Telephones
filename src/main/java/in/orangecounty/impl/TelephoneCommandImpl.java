@@ -41,6 +41,7 @@ public class TelephoneCommandImpl{
         messageScheduledFuture = scheduler.scheduleAtFixedRate(new Runnable() {
             @Override
             public void run() {
+                log.debug("Message Scheduler");
                 sendMessages();
             }
         }, 0, 1, TimeUnit.SECONDS);
@@ -48,6 +49,7 @@ public class TelephoneCommandImpl{
         statusEnquiryScheduledFuture = scheduler.scheduleAtFixedRate(new Runnable() {
             @Override
             public void run() {
+                log.debug("Status Enquiry Scheduler");
                 if(!messages.contains(msg70FCrc)){
                     synchronized (messageReadFlag) {
                         messages.add(msg70FCrc);
@@ -58,6 +60,7 @@ public class TelephoneCommandImpl{
     }
 
     private void sendMessages() {
+        log.debug("Send Messages Called");
         int count = 0;
         while (!messages.isEmpty()) {
             synchronized (messageReadFlag) {
@@ -80,6 +83,7 @@ public class TelephoneCommandImpl{
     }
 
     private void queueMessage(String message){
+        log.debug("Queue Messages Called");
         message = message + (char) lrc(message);
         synchronized (messageReadFlag) {
             messages.add(message.getBytes());
