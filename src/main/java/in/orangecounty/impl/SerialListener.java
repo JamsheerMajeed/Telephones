@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
 
 /**
  * SerialListener
@@ -74,15 +75,16 @@ public class SerialListener implements SerialPortEventListener {
     }
 
     private void process(int b){
-        log.debug("Received int message " + b);
         buffer.append((char) b);
+        String bufferString = buffer.toString();
+        log.debug("Buffer : " + bufferString + " : " + Arrays.toString(bufferString.getBytes()));
         if (buffer.length() > 0 && buffer.charAt(buffer.length() - 2) == ETX) {
-            log.warn("message with BCC" + buffer.toString());
-            log.warn("check bcc:" + checkLrc(buffer.toString()));
-            log.warn("check count:" + checkCount(buffer.toString()));
-            if (checkLrc(buffer.toString()) && checkCount(buffer.toString())) {
+            boolean bccCheck = checkLrc(bufferString);
+            boolean countCheck = checkCount(bufferString);
+            log.warn("check bcc:" + bccCheck + " | check count :" + countCheck);
+            if (bccCheck && countCheck) {
                 sender.sendACK();
-                processMessage(buffer.toString());
+                processMessage(bufferString);
             } else {
                 sender.sendNAK();
             }
@@ -117,8 +119,6 @@ public class SerialListener implements SerialPortEventListener {
                     sender.sendEOT();
                 }
                 break;
-            default:
-                log.debug("Default Case Buffer:" + buffer.toString());
         }
 
     }
