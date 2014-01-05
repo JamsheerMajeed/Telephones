@@ -57,8 +57,10 @@ public class TelephoneCommandImpl {
         while (!messages.isEmpty()) {
             log.debug("Messages Not Empty");
             if (sender.sendMessage(messages.peek())) {
+                log.debug("Poll Called");
                 messages.poll();
             } else {
+                log.debug("sender.sendMessage() returned False");
                 if (count > 10) {
                     break;
                 }
