@@ -91,6 +91,7 @@ public class SerialListener implements SerialPortEventListener {
             resetBuffer();
             return;
         }
+        log.debug("Proceeding to switch ");
         switch (b) {
             case (ACK):
                 log.debug("ACK Case");
@@ -98,12 +99,12 @@ public class SerialListener implements SerialPortEventListener {
                 resetBuffer();
                 break;
             case (NAK):
-                log.warn("NAK Case");
+                log.debug("NAK Case");
                 sender.nakReceived();
                 resetBuffer();
                 break;
             case (ENQ):
-                log.warn("ENQ Case");
+                log.debug("ENQ Case");
                 sender.sendACK();
                 sender.setReceiving(true);
                 resetBuffer();
@@ -119,6 +120,8 @@ public class SerialListener implements SerialPortEventListener {
                     sender.sendEOT();
                 }
                 break;
+            default:
+                System.out.print("p");
         }
 
     }
