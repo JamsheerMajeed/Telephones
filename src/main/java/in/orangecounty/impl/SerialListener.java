@@ -78,7 +78,7 @@ public class SerialListener implements SerialPortEventListener {
         buffer.append((char) b);
         String bufferString = buffer.toString();
         log.debug("Buffer : " + bufferString + " : " + Arrays.toString(bufferString.getBytes()));
-        if (buffer.length() > 0 && buffer.charAt(buffer.length() - 2) == ETX) {
+        if (buffer.length() > 2 && buffer.charAt(buffer.length() - 2) == ETX) {
             boolean bccCheck = checkLrc(bufferString);
             boolean countCheck = checkCount(bufferString);
             log.warn("check bcc:" + bccCheck + " | check count :" + countCheck);
