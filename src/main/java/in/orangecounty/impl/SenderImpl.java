@@ -28,7 +28,6 @@ public class SenderImpl {
 
 
     private byte[] currentMessage = null;
-    private final Object receivingLock = new Object();
 
     private OutputStream os;
 
@@ -126,9 +125,7 @@ public class SenderImpl {
     }
 
     protected void setReceiving(boolean receiving) {
-        synchronized (receivingLock) {
-            this.receiving = receiving;
-        }
+        this.receiving = receiving;
     }
 
     protected void nakReceived() {
@@ -176,14 +173,12 @@ public class SenderImpl {
     }
 
     protected boolean sendMessage(byte[] payload) {
-        synchronized (receivingLock) {
-            if (!receiving && !isSending()) {
-                currentMessage = payload;
-                initCommunication();
-                return true;
-            } else {
-                return false;
-            }
+        if (!receiving && !isSending()) {
+            currentMessage = payload;
+            initCommunication();
+            return true;
+        } else {
+            return false;
         }
     }
 
