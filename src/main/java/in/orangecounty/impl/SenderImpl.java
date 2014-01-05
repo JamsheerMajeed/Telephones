@@ -173,6 +173,7 @@ public class SenderImpl {
     }
 
     protected boolean sendMessage(byte[] payload) {
+        log.debug("Sender Send Messages Called");
         if (!receiving && !isSending()) {
             currentMessage = payload;
             initCommunication();
