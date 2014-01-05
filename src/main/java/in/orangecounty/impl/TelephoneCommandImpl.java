@@ -3,21 +3,18 @@ package in.orangecounty.impl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.LinkedList;
 import java.util.Map;
 import java.util.Queue;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 
 /**
+ * Telephone Command Implementation
  * User: thomas
  * Date: 3/12/13
  * Time: 9:05 AM
  */
-public class TelephoneCommandImpl{
+public class TelephoneCommandImpl {
     Logger log = LoggerFactory.getLogger(TelephoneCommandImpl.class);
     private final String MSG_70_F_CRC = "\u00021!L7007F  \u0003\u0019";
     private final String MSG_70_F = "\u00021!L7007F  \u0003";
@@ -26,9 +23,8 @@ public class TelephoneCommandImpl{
 
 
     private SenderImpl sender;
-    private final Object messageReadFlag = new Object();
     private final byte[] msg70FCrc = MSG_70_F_CRC.getBytes();
-    private Queue<byte[]> messages = new LinkedList<byte[]>();
+    private Queue<byte[]> messages = new ConcurrentLinkedQueue<byte[]>();
     private final ScheduledExecutorService scheduler;
     private ScheduledFuture messageScheduledFuture;
     private ScheduledFuture statusEnquiryScheduledFuture;
@@ -41,7 +37,6 @@ public class TelephoneCommandImpl{
         messageScheduledFuture = scheduler.scheduleAtFixedRate(new Runnable() {
             @Override
             public void run() {
-                log.debug("Message Scheduler");
                 sendMessages();
             }
         }, 0, 1, TimeUnit.SECONDS);
@@ -50,28 +45,23 @@ public class TelephoneCommandImpl{
             @Override
             public void run() {
                 log.debug("Status Enquiry Scheduler");
-                if(!messages.contains(msg70FCrc)){
-                    synchronized (messageReadFlag) {
-                        messages.add(msg70FCrc);
-                    }
+                if (!messages.contains(msg70FCrc)) {
+                    messages.add(msg70FCrc);
                 }
             }
         }, 0, 55, TimeUnit.SECONDS);
     }
 
     private void sendMessages() {
-        log.debug("Send Messages Called");
         int count = 0;
         while (!messages.isEmpty()) {
-            synchronized (messageReadFlag) {
-                if (sender.sendMessage(messages.peek())) {
-                    messages.poll();
-                } else {
-                    if (count > 10) {
-                        break;
-                    }
-                    count++;
+            if (sender.sendMessage(messages.peek())) {
+                messages.poll();
+            } else {
+                if (count > 10) {
+                    break;
                 }
+                count++;
             }
         }
     }
@@ -82,12 +72,10 @@ public class TelephoneCommandImpl{
         queueMessage(msg);
     }
 
-    private void queueMessage(String message){
+    private void queueMessage(String message) {
         log.debug("Queue Messages Called");
         message = message + (char) lrc(message);
-        synchronized (messageReadFlag) {
-            messages.add(message.getBytes());
-        }
+        messages.add(message.getBytes());
     }
 
     protected void checkOut(String extensionNumber) {
@@ -98,7 +86,7 @@ public class TelephoneCommandImpl{
         //Queue 70.3 Message
         queueMessage(MSG_70_3);
         // For Each Extension queue 17.B Message
-        for(String extension : extensions.keySet()){
+        for (String extension : extensions.keySet()) {
             queueMessage(parseRoomImage(extension, extensions.get(extension)));
 
         }
@@ -108,7 +96,7 @@ public class TelephoneCommandImpl{
 
     private String parseRoomImage(String extension, String name) {
         String rv = null;
-        if(name != null){
+        if (name != null) {
 
         } else {
 
@@ -121,7 +109,7 @@ public class TelephoneCommandImpl{
         if (messageScheduledFuture != null) {
             messageScheduledFuture.cancel(true);
         }
-        if (statusEnquiryScheduledFuture != null){
+        if (statusEnquiryScheduledFuture != null) {
             statusEnquiryScheduledFuture.cancel(true);
         }
         scheduler.shutdown();
@@ -161,7 +149,7 @@ public class TelephoneCommandImpl{
         return guestName;
     }
 
-    private byte lrc(final byte[] msg){
+    private byte lrc(final byte[] msg) {
         byte lrc = 0;
         for (int x = 1; x < msg.length; x++) {
             lrc = (byte) (lrc ^ msg[x]);
