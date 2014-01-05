@@ -174,7 +174,7 @@ public class SenderImpl {
 
     protected boolean sendMessage(byte[] payload) {
         log.debug("Sender Send Messages Called.  Sending status : " + isSending() + "| Receiving Status " + receiving);
-        if (!receiving && !isSending()) {
+        if (!isSending()) {
             currentMessage = payload;
             initCommunication();
             return true;
