@@ -55,6 +55,7 @@ public class TelephoneCommandImpl {
     private void sendMessages() {
         int count = 0;
         while (!messages.isEmpty()) {
+            log.debug("Messages Not Empty");
             if (sender.sendMessage(messages.peek())) {
                 messages.poll();
             } else {
@@ -76,6 +77,7 @@ public class TelephoneCommandImpl {
         log.debug("Queue Messages Called");
         message = message + (char) lrc(message);
         messages.add(message.getBytes());
+        log.debug("Messages Size : " + messages.size());
     }
 
     protected void checkOut(String extensionNumber) {
