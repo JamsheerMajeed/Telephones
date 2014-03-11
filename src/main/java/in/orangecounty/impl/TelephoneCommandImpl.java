@@ -20,6 +20,10 @@ public class TelephoneCommandImpl {
     private final String MSG_70_F = "\u00021!L7007F  \u0003";
     private final String MSG_70_3 = "\u00021!L70073  \u0003";
     private final String MSG_70_4 = "\u00021!L70074  \u0003";
+    /** Checkout Message Template requires 1 argument Extension Number */
+    private final String MSG_16_2= "\u00021!L16112%-4s  \u0003";
+    /** Checkin Message Template requires 2 arguments Extension Number and Guest Name */
+    private final String MSG_16_B = "\u00021!L1634B%-4s        21%-15s\u0003";
 
 
     private SenderImpl sender;
@@ -31,6 +35,7 @@ public class TelephoneCommandImpl {
 
 
     protected TelephoneCommandImpl(SenderImpl sender) {
+
         this.sender = sender;
 
         scheduler = Executors.newScheduledThreadPool(2);
@@ -69,7 +74,7 @@ public class TelephoneCommandImpl {
 
     protected void checkIn(String extensionNumber, String guestName) {
         log.debug("checkIn Called");
-        String msg = parseActivateExtension(reSizeExtensionNumber(extensionNumber), reSizeGuestName(guestName));
+        String msg = String.format(MSG_16_B, truncate(extensionNumber, 4), truncate(guestName, 15));
         queueMessage(msg);
     }
 
@@ -81,22 +86,35 @@ public class TelephoneCommandImpl {
     }
 
     protected void checkOut(String extensionNumber) {
-        queueMessage(paresCheckOut(extensionNumber));
+        String msg1 = paresCheckOut(extensionNumber);
+        String msg2 = String.format(MSG_16_2, extensionNumber);
+        log.debug(msg1);
+        log.debug(msg2);
+        queueMessage(msg1);
+    }
+
+    protected String truncate(String string, int length){
+        String rv;
+        if(string.length() < length){
+            rv = string;
+        } else {
+            rv = string.substring(0, length);
+        }
+        return rv;
     }
 
     protected void sync(Map<String, String> extensions) {
         //Queue 70.3 Message
         queueMessage(MSG_70_3);
         // For Each Extension queue 17.B Message
-        for (String extension : extensions.keySet()) {
-            queueMessage(parseRoomImage(extension, extensions.get(extension)));
-
+        for (Map.Entry<String, String> entry : extensions.entrySet()){
+            queueMessage(String.format("%s%s", entry.getKey(), entry.getValue()));
         }
         //Queue 70.4 Message
         queueMessage(MSG_70_4);
     }
 
-    private String parseRoomImage(String extension, String name) {
+    public String parseRoomImage(String extension, String name) {
         String rv = null;
         if (name != null) {
 
@@ -117,13 +135,13 @@ public class TelephoneCommandImpl {
         scheduler.shutdown();
     }
 
-    private String parseActivateExtension(String extensionNumber, String guestName) {
+    public String parseActivateExtension(String extensionNumber, String guestName) {
         guestName = reSizeGuestName(guestName);
         extensionNumber = reSizeExtensionNumber(extensionNumber);
         return "\u00021!L1634B" + extensionNumber + "        21" + guestName + "\u0003";
     }
 
-    private String paresCheckOut(String extensionNumber) {
+    public String paresCheckOut(String extensionNumber) {
         extensionNumber = reSizeExtensionNumber(extensionNumber);
         return "\u00021!L16112" + extensionNumber + "  \u0003";
     }

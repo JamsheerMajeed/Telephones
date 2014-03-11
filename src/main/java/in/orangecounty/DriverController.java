@@ -14,5 +14,12 @@ public interface DriverController {
 
     void checkOut(String extension);
 
+    /**
+     * A Method to synchronize the Extensions with the PBX.
+     *
+     * @param extensions The Extensions would be a Map. The Maps keys would be the extension number and
+     *                   the value would the name of the guest or the user at the extensions.
+     *                   If the extension is not used the value would be NULL.
+     */
     void sync(Map<String, String> extensions);
 }
