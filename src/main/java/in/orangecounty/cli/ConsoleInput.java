@@ -23,7 +23,7 @@ public class ConsoleInput implements Runnable {
     private DriverController driverController = new DriverControllerImpl();
 
     private enum Command{
-        exit, checkin, checkout, sync, start;
+        exit, checkin, checkout, sync, start
     }
 
 
@@ -69,7 +69,7 @@ public class ConsoleInput implements Runnable {
         while (m.find()){
             list.add(m.group(1).replace("\"", "")); // Add .replace("\"", "") to remove surrounding quotes.
         }
-        Command command = null;
+        Command command;
         try {
             command = Command.valueOf(list.get(0));
         } catch (IllegalArgumentException e) {
