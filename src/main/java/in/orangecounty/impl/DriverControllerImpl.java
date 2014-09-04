@@ -19,20 +19,20 @@ import java.util.TooManyListenersException;
  * Created by thomas on 30/12/13.
  */
 public class DriverControllerImpl implements DriverController {
-    Logger log = LoggerFactory.getLogger(DriverControllerImpl.class);
+    private Logger log = LoggerFactory.getLogger(DriverControllerImpl.class);
+    private static final int CONNECTION_TIMEOUT = 2000;
+    private static final int BRAUD_RATE = 1200;
 
-    SerialPort serialPort;
-    private boolean running;
+    private SerialPort serialPort;
     private TelephoneCommandImpl telephoneCommands;
-    OutputStream outputStream;
-    InputStream inputStream;
+    private OutputStream outputStream;
+    private InputStream inputStream;
     private SenderImpl sender;
-    private SerialListener listener;
 //    private ListenerThreadImpl listenerThread;
 //    SerialHelper serialHelper;
 
     @Override
-    public void start() {
+    public final void start() {
         connect();
         sender = new SenderImpl(outputStream);
         log.debug("Sender Created");
@@ -40,7 +40,7 @@ public class DriverControllerImpl implements DriverController {
         try {
             serialPort.addEventListener(serialListener);
         } catch (TooManyListenersException e) {
-            e.printStackTrace();
+            log.debug("Too Many Listeners Exception thrown", e);
         }
         log.debug("Listener Created");
         telephoneCommands = new TelephoneCommandImpl(sender);
@@ -55,10 +55,10 @@ public class DriverControllerImpl implements DriverController {
                 log.error("Port In Use");
             } else {
                 // points who owns the port and connection timeout
-                serialPort = (SerialPort) portIdentifier.open("TelApp", 2000);
+                serialPort = (SerialPort) portIdentifier.open("TelApp", CONNECTION_TIMEOUT);
                 // setup connection parameters
                 serialPort.setSerialPortParams(
-                        1200,
+                        BRAUD_RATE,
                         SerialPort.DATABITS_7,
                         SerialPort.STOPBITS_1,
                         SerialPort.PARITY_EVEN);
@@ -78,7 +78,7 @@ public class DriverControllerImpl implements DriverController {
     }
 
     @Override
-    public void stop() {
+    public final void stop() {
         if (sender != null) {
             sender.stop();
         }
@@ -87,21 +87,22 @@ public class DriverControllerImpl implements DriverController {
         }
         serialPort.removeEventListener();
         serialPort.close();
-        running = false;
     }
 
     @Override
-    public void checkIn(String extension, String name){
-        telephoneCommands.checkIn(extension, name);
+    public final void checkIn(String extension, String name){
+        Integer ext = Integer.parseInt(extension);
+        telephoneCommands.checkIn(ext, name);
     }
 
     @Override
-    public void checkOut(String extension){
-        telephoneCommands.checkOut(extension);
+    public final void checkOut(String extension){
+        Integer ext = Integer.parseInt(extension);
+        telephoneCommands.checkOut(ext);
     }
 
     @Override
-    public void sync(Map<String, String> extensions){
+    public final void sync(Map<String, String> extensions){
         telephoneCommands.sync(extensions);
     }
 }

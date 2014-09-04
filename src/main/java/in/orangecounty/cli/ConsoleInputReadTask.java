@@ -11,7 +11,7 @@ import java.util.concurrent.Callable;
  * The ConsoleInputReadTask
  */
 public class ConsoleInputReadTask implements Callable<String> {
-    public String call() throws IOException {
+    public final String call() throws IOException {
         BufferedReader br = new BufferedReader(
                 new InputStreamReader(System.in));
         String input;

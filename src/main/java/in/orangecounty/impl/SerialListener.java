@@ -14,7 +14,7 @@ import java.util.Arrays;
  * Created by thomas on 19/12/13.
  */
 public class SerialListener implements SerialPortEventListener {
-    Logger log = LoggerFactory.getLogger(SerialListener.class);
+    private Logger log = LoggerFactory.getLogger(SerialListener.class);
 
     /**
      * End of Transmission.
@@ -43,9 +43,9 @@ public class SerialListener implements SerialPortEventListener {
 
 
 
-    InputStream inputStream;
-    SenderImpl sender;
-    StringBuilder buffer = new StringBuilder();
+    private InputStream inputStream;
+    private SenderImpl sender;
+    private StringBuilder buffer = new StringBuilder();
 
     public SerialListener(InputStream inputStream, SenderImpl sender) {
         this.inputStream = inputStream;
@@ -53,7 +53,7 @@ public class SerialListener implements SerialPortEventListener {
     }
 
     @Override
-    public void serialEvent(SerialPortEvent ev) {
+    public final void serialEvent(SerialPortEvent ev) {
         log.debug("Serial Event Received :" + ev.getEventType());
         switch (ev.getEventType()){
             case(SerialPortEvent.DATA_AVAILABLE):

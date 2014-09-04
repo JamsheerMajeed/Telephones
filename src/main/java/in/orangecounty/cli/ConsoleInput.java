@@ -2,11 +2,9 @@ package in.orangecounty.cli;
 
 import in.orangecounty.DriverController;
 import in.orangecounty.impl.DriverControllerImpl;
-import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -20,16 +18,16 @@ import java.util.regex.Pattern;
  * The ConsoleInput Class
  */
 public class ConsoleInput implements Runnable {
-    Logger log = LoggerFactory.getLogger(ConsoleInput.class);
+    private Logger log = LoggerFactory.getLogger(ConsoleInput.class);
     private boolean running = false;
-    DriverController driverController = new DriverControllerImpl();
+    private DriverController driverController = new DriverControllerImpl();
 
     private enum Command{
         exit, checkin, checkout, sync, start;
     }
 
 
-    public String readLine() {
+    public final String readLine() {
         ExecutorService ex = Executors.newSingleThreadExecutor();
         String input = null;
         try {
@@ -41,7 +39,7 @@ public class ConsoleInput implements Runnable {
                     input = result.get(60, TimeUnit.SECONDS);
                     break;
                 } catch (ExecutionException e) {
-                    e.getCause().printStackTrace();
+                    log.error("Execution Exception", e);
                 } catch (TimeoutException e) {
                     result.cancel(true);
                     log.debug("Thread cancelled. input is null");
@@ -57,7 +55,7 @@ public class ConsoleInput implements Runnable {
         return input;
     }
 
-    public void run() {
+    public final void run() {
         running = true;
         driverController.start();
         while (running) {

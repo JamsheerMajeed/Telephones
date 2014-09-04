@@ -19,7 +19,7 @@ import java.util.concurrent.*;
  * Modified at: 7:17 PM
  */
 public class SenderImpl {
-    final Logger log = LoggerFactory.getLogger(SenderImpl.class);
+    private final Logger log = LoggerFactory.getLogger(SenderImpl.class);
     private static final String INIT = "\u0031\u0021\u0005";
     private final byte[] ACK = new byte[]{6};
     private final byte[] ENQ = new byte[]{5};
@@ -40,15 +40,15 @@ public class SenderImpl {
     private boolean msgSent = false;
     private boolean selectSequenceSent = false;
     private boolean receiving = false;
-    ScheduledFuture future;
-    ScheduledExecutorService ex;
+    private ScheduledFuture future;
+    private ScheduledExecutorService ex;
 
 
     protected SenderImpl(OutputStream op) {
         this.os = op;
     }
 
-    protected void stop() {
+    protected final void stop() {
         stopScheduler();
     }
 
@@ -71,15 +71,9 @@ public class SenderImpl {
         }
     }
 
-    private void write(byte payload) {
-        byte[] a = new byte[1];
-        a[0] = payload;
-        write(a);
-    }
-
     //[Console Input] DEBUG in.orangecounty.impl.SenderImpl - Writing to Output :
 
-    protected void ackReceived() {
+    protected final void ackReceived() {
         log.debug("Ack Received Called");
         if (selectSequenceSent) {
             stopScheduler();
@@ -109,37 +103,37 @@ public class SenderImpl {
         counter = 0;
     }
 
-    protected void sendACK() {
+    protected final void sendACK() {
         log.debug("Writing ACK");
         write(ACK);
     }
 
-    protected void sendNAK() {
+    protected final void sendNAK() {
         log.debug("Writing NAK");
         write(NAK);
     }
 
-    protected void sendEOT() {
+    protected final void sendEOT() {
         log.debug("Writing EOT");
         write(EOT);
     }
 
-    protected void setReceiving(boolean receiving) {
+    protected final void setReceiving(boolean receiving) {
         this.receiving = receiving;
     }
 
-    protected void nakReceived() {
+    protected final void nakReceived() {
         log.debug("NAK Received ......");
         //TODO implement what has to be done when receiving a NAK
     }
 
-    protected boolean isSending() {
+    protected final boolean isSending() {
         boolean rv = msgSent || selectSequenceSent;
         log.debug("Is Sending:" + rv);
         return rv;
     }
 
-    protected void interrupt() {
+    protected final void interrupt() {
         log.debug("Interrupt Received");
         sendEOT();
         receiving = false;
@@ -147,7 +141,7 @@ public class SenderImpl {
         msgSent = false;
     }
 
-    protected void sendEnq() {
+    protected final void sendEnq() {
         write(ENQ);
     }
 
@@ -172,10 +166,10 @@ public class SenderImpl {
         }, 0l, TIMER_1_TIME_INTERVAL, TimeUnit.MILLISECONDS);
     }
 
-    protected boolean sendMessage(byte[] payload) {
+    protected final boolean sendMessage(final byte[] payload) {
         log.debug("Sender Send Messages Called.  Sending status : " + isSending() + "| Receiving Status " + receiving);
         if (!receiving && !isSending()) {
-            currentMessage = payload;
+            currentMessage = payload.clone();
             initCommunication();
             return true;
         } else {
@@ -183,7 +177,7 @@ public class SenderImpl {
         }
     }
 
-    protected boolean canSend() {
+    protected final boolean canSend() {
         return !isSending() && !receiving;
     }
 
