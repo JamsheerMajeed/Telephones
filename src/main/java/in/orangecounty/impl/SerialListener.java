@@ -121,7 +121,7 @@ public class SerialListener implements SerialPortEventListener {
                 }
                 break;
             default:
-                System.out.print("p");
+                log.debug("p");
         }
 
     }
