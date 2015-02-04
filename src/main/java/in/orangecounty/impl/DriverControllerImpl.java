@@ -21,7 +21,7 @@ import java.util.TooManyListenersException;
 public class DriverControllerImpl implements DriverController {
     private Logger log = LoggerFactory.getLogger(DriverControllerImpl.class);
     private static final int CONNECTION_TIMEOUT = 2000;
-    private static final int BRAUD_RATE = 1200;
+    private static final int BAUD_RATE = 1200;
 
     private SerialPort serialPort;
     private TelephoneCommandImpl telephoneCommands;
@@ -50,7 +50,7 @@ public class DriverControllerImpl implements DriverController {
     private void connect() {
         try {
             //TODO currently /dev/ttyS0 is hard coded find a way to pass it as a parameter.
-            CommPortIdentifier portIdentifier = CommPortIdentifier.getPortIdentifier("/dev/ttyS0");
+            CommPortIdentifier portIdentifier = CommPortIdentifier.getPortIdentifier("/dev/ttyUSB0");
             if (portIdentifier.isCurrentlyOwned()) {
                 log.error("Port In Use");
             } else {
@@ -58,7 +58,7 @@ public class DriverControllerImpl implements DriverController {
                 serialPort = (SerialPort) portIdentifier.open("TelApp", CONNECTION_TIMEOUT);
                 // setup connection parameters
                 serialPort.setSerialPortParams(
-                        BRAUD_RATE,
+                        BAUD_RATE,
                         SerialPort.DATABITS_7,
                         SerialPort.STOPBITS_1,
                         SerialPort.PARITY_EVEN);
