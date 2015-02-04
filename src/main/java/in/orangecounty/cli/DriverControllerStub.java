@@ -4,6 +4,8 @@ import in.orangecounty.DriverController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.beans.XMLEncoder;
+import java.io.ByteArrayOutputStream;
 import java.util.Map;
 
 /**
@@ -32,6 +34,12 @@ public class DriverControllerStub implements DriverController {
 
     @Override
     public final void sync(Map<String, String> extensions) {
-        System.out.printf("\nSync Called \n Parameters %s \n\n", extensions.toString());
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        XMLEncoder xmlEncoder = new XMLEncoder(bos);
+        xmlEncoder.writeObject(extensions);
+        xmlEncoder.flush();
+
+        String serializedMap = bos.toString();
+        log.debug(String.format("\nSync Called \n Parameters %s \n\n", serializedMap));
     }
 }
