@@ -50,7 +50,7 @@ public class DriverControllerImpl implements DriverController {
     private void connect() {
         try {
             //TODO currently /dev/ttyS0 is hard coded find a way to pass it as a parameter.
-            CommPortIdentifier portIdentifier = CommPortIdentifier.getPortIdentifier("/dev/ttyUSB0");
+            CommPortIdentifier portIdentifier = CommPortIdentifier.getPortIdentifier("/dev/ttyS0");
             if (portIdentifier.isCurrentlyOwned()) {
                 log.error("Port In Use");
             } else {
