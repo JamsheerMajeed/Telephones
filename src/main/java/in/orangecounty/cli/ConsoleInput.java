@@ -2,9 +2,15 @@ package in.orangecounty.cli;
 
 import in.orangecounty.DriverController;
 import in.orangecounty.impl.DriverControllerImpl;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -98,12 +104,17 @@ public class ConsoleInput implements Runnable {
                 }
                 break;
             case sync:
-                Map<String, String> extensions = new HashMap<String, String>();
-                for(String item : list){
-                    if(item.matches("^[^:]+:[^:]+$")){
-                        String[] keyValue = item.split(":");
-                        extensions.put(keyValue[0], keyValue[1]);
-                    }
+                if(!(list.size()==2)){
+                    System.out.printf("\nUsage: sync <Path to File>\n");
+                    break;
+                }
+                Map<String, String> extensions = null;
+                try {
+                    extensions = parseFile(list.get(1));
+                } catch (IOException e) {
+                    System.out.printf("\nCould Not Open File %s\n", list.get(1));
+                    log.error("Could not open file", e);
+                    break;
                 }
                 driverController.sync(extensions);
                 break;
@@ -114,6 +125,15 @@ public class ConsoleInput implements Runnable {
                 printMessage();
                 break;
         }
+    }
+
+    private Map<String, String> parseFile(String s) throws IOException {
+        Map<String, String> rv = new HashMap<String, String>();
+        CSVParser parser = CSVParser.parse(new File(s), Charset.defaultCharset(), CSVFormat.EXCEL.withHeader());
+        for(CSVRecord record: parser.getRecords()){
+            rv.put(record.get(0), record.get(1));
+        }
+        return rv;
     }
 
     private void printMessage() {
