@@ -68,9 +68,11 @@ public class DataLinkProtocol implements SerialListener {
             log.debug("Received a  message ");
             /*Check BCC and Send ACK/NAK and change the phase to 0
             getBCC(message)*/
-            byte bcc = getBCC(Arrays.copyOfRange(message, 1, message.length - 1));
+            byte[] payload = Arrays.copyOfRange(message, 1, message.length - 1);
+            byte bcc = getBCC(payload);
             log.debug("Message BCC {} | Calculated BCC {}", message[message.length - 1], bcc);
             if(message[message.length-1] == bcc){
+                log.info("Receive Message : {}", new String(payload));
                 /*//Stop Timer 2-1 (32 Seconds)
                 sendACK();
                 //Start Timer 2-2 (32 Seconds)*/
