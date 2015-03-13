@@ -6,7 +6,6 @@ import org.slf4j.LoggerFactory;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.TooManyListenersException;
 
 /**
  * Created by thomas on 6/3/15.
@@ -14,7 +13,11 @@ import java.util.TooManyListenersException;
 public class Bootstrap {
     private static final Logger log = LoggerFactory.getLogger(Bootstrap.class);
     public static void main(String[] args) {
-        final MessageSender messageSender = new SerialMessageSenderImpl();
+
+        final AckNakProtocol ackNakProtocol = new AckNakProtocol();
+        final SerialSender serialSender = new SerialImpl(ackNakProtocol);
+        ackNakProtocol.setSerialSender(serialSender);
+
         Thread t2 = new Thread(new Runnable() {
             @Override
             public void run() {
@@ -31,21 +34,31 @@ public class Bootstrap {
 
             private void processCommand(String command) {
                 if(command.toUpperCase().equals("EXIT")){
-                    messageSender.stop();
+                    serialSender.stop();
                     System.exit(0);
+                } else if(command.toUpperCase().equals("STOP")){
+                    serialSender.stop();
                 } else if(command.toUpperCase().equals("LIST")){
-                    messageSender.listPorts();
+                    serialSender.listPorts();
+                } else if(command.toUpperCase().equals("ENQ")){
+                    try {
+                        serialSender.sendMessage(new byte[]{5});
+                    } catch (IOException e) {
+                        log.debug("IO Exception :", e);
+                    }
+                } else if(command.toUpperCase().equals("STATUS")){
+                    ackNakProtocol.sendMessage("1!L7007F  ");
                 }else if(command.toUpperCase().equals("START")){
                     try {
-                        messageSender.start();
+                        serialSender.start();
                     } catch (IOException e) {
                         log.error("IO Exception", e);
                     }
                 } else {
                     try {
-                        messageSender.sendMessage(command.getBytes());
-                    } catch (IOException e) {
-                        log.debug("IO Exception", e);
+                        ackNakProtocol.sendMessage(command);
+                    } catch (RuntimeException e) {
+                        log.debug("Runtime Exception", e);
                     }
                 }
                 

@@ -15,15 +15,15 @@ import java.util.TooManyListenersException;
 /**
  * Created by thomas on 6/3/15.
  */
-public class SerialMessageSenderImpl implements MessageSender {
-    private static final Logger log = LoggerFactory.getLogger(SerialMessageSenderImpl.class);
-    private MessageListener messageListener;
+public class SerialImpl implements SerialSender {
+    private static final Logger log = LoggerFactory.getLogger(SerialImpl.class);
+    private SerialListener serialListener;
     private InputStream inputStream;
     private OutputStream outputStream;
     private SerialPort serialPort;
 
-    public void setMessageListener(MessageListener messageListener) {
-        this.messageListener = messageListener;
+    public SerialImpl(SerialListener serialListener) {
+        this.serialListener = serialListener;
     }
 
     public void start() throws IOException {
@@ -36,19 +36,20 @@ public class SerialMessageSenderImpl implements MessageSender {
             throw new IOException("Set Environment Variable " + envVarName);
         }
         this.connect(env.get(envVarName));
+//        this.connect(env.get("/dev/ttyUSB0"));
 
     }
 
     public void stop() {
         if (serialPort != null) {
             try {
-                // close the i/o streams.
+                /* close the i/o streams.  */
                 outputStream.close();
                 inputStream.close();
             } catch (IOException ex) {
-                // don't care
+            /*    don't care */
             }
-            // Close the port.
+            /* Close the port. */
             serialPort.close();
             serialPort = null;
         }
@@ -75,21 +76,22 @@ public class SerialMessageSenderImpl implements MessageSender {
     }
 
     private void connect(String portName) throws IOException {
+//        portName = "/dev/ttyUSB0";
         log.debug("PortName: {}", portName);
         try {
-            // Obtain a CommPortIdentifier object for the port you want to open
+            /*  Obtain a CommPortIdentifier object for the port you want to open */
             CommPortIdentifier portId =
                     CommPortIdentifier.getPortIdentifier(portName);
 
-            // Get the port's ownership
+            /*  Get the port's ownership */
             serialPort = (SerialPort) portId.open("Demo application", 5000);
 
-            // Set the parameters of the connection.
+            /*  Set the parameters of the connection. */
             setSerialPortParameters();
 
-            // Open the input and output streams for the connection.
-            // If they won't open, close the port before throwing an
-            // exception.
+            /* Open the input and output streams for the connection.
+             If they won't open, close the port before throwing an
+             exception. */
             outputStream = serialPort.getOutputStream();
             inputStream = serialPort.getInputStream();
             serialPort.addEventListener(new SerialPortEventListener() {
@@ -99,19 +101,21 @@ public class SerialMessageSenderImpl implements MessageSender {
                         case SerialPortEvent.DATA_AVAILABLE:
                             byte[] readBuffer = new byte[400];
                             try {
+                                Thread.sleep(600);
                                 int availableBytes = inputStream.available();
                                 if (availableBytes > 0) {
-                                    // Read the serial port
+                                    /* Read the serial port */
                                     inputStream.read(readBuffer, 0, availableBytes);
                                     byte[] readCopy = Arrays.copyOfRange(readBuffer,0, availableBytes);
 
-                                    // Print it out
+                                    /* Print it out */
                                     log.debug("Received : {} coverted to {}", readCopy, new String(readCopy));
-                                    if(messageListener!=null){
-                                        messageListener.onMessage(readCopy);
+                                    if(serialListener !=null){
+                                        serialListener.onMessage(readCopy);
                                     }
                                 }
                             } catch (IOException e) {
+                            } catch (InterruptedException e) {
                             }
                     }
                 }
@@ -135,15 +139,15 @@ public class SerialMessageSenderImpl implements MessageSender {
 
     private void setSerialPortParameters() throws IOException {
 
-        final int baudRate = 57600; // 57600bps
+        final int baudRate = 1200; /* 57600bps */
 
         try {
-            // Set serial port to 57600bps-8N1..my favourite
+            /*  Set serial port to 57600bps-8N1..my favourite */
             serialPort.setSerialPortParams(
                     baudRate,
                     SerialPort.DATABITS_7,
                     SerialPort.STOPBITS_1,
-                    SerialPort.PARITY_NONE);
+                    SerialPort.PARITY_EVEN);
 
             serialPort.setFlowControlMode(SerialPort.FLOWCONTROL_NONE);
         } catch (UnsupportedCommOperationException ex) {
