@@ -1,5 +1,8 @@
-package in.orangecounty.tel.impl;
+package in.orangecounty.tel.cli;
 
+import in.orangecounty.tel.impl.DataLinkProtocol;
+import in.orangecounty.tel.impl.SerialImpl;
+import in.orangecounty.tel.SerialSender;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,9 +17,10 @@ public class Bootstrap {
     private static final Logger log = LoggerFactory.getLogger(Bootstrap.class);
     public static void main(String[] args) {
 
-        final AckNakProtocol ackNakProtocol = new AckNakProtocol();
-        final SerialSender serialSender = new SerialImpl(ackNakProtocol);
-        ackNakProtocol.setSerialSender(serialSender);
+        final DataLinkProtocol dataLinkProtocol = new DataLinkProtocol();
+        final SerialSender serialSender = new SerialImpl();
+        serialSender.setSerialListener(dataLinkProtocol);
+        dataLinkProtocol.setSerialSender(serialSender);
 
         Thread t2 = new Thread(new Runnable() {
             @Override
@@ -47,7 +51,7 @@ public class Bootstrap {
                         log.debug("IO Exception :", e);
                     }
                 } else if(command.toUpperCase().equals("STATUS")){
-                    ackNakProtocol.sendMessage("1!L7007F  ");
+                    dataLinkProtocol.sendMessage("1!L7007F  ");
                 }else if(command.toUpperCase().equals("START")){
                     try {
                         serialSender.start();
@@ -56,7 +60,7 @@ public class Bootstrap {
                     }
                 } else {
                     try {
-                        ackNakProtocol.sendMessage(command);
+                        dataLinkProtocol.sendMessage(command);
                     } catch (RuntimeException e) {
                         log.debug("Runtime Exception", e);
                     }

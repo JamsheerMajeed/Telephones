@@ -1,6 +1,8 @@
 package in.orangecounty.tel.impl;
 
 import gnu.io.*;
+import in.orangecounty.tel.SerialListener;
+import in.orangecounty.tel.SerialSender;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,9 +24,13 @@ public class SerialImpl implements SerialSender {
     private OutputStream outputStream;
     private SerialPort serialPort;
 
-    public SerialImpl(SerialListener serialListener) {
+
+
+    @Override
+    public void setSerialListener(SerialListener serialListener) {
         this.serialListener = serialListener;
     }
+
 
     public void start() throws IOException {
         if (serialPort != null) {

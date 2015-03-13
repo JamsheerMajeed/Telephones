@@ -1,5 +1,7 @@
 package in.orangecounty.tel.impl;
 
+import in.orangecounty.tel.SerialListener;
+import in.orangecounty.tel.SerialSender;
 import org.apache.commons.lang.ArrayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,10 +14,14 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 /**
+ * The DataLinkProtocol uses the SerailImpl as the physical layer to send and receive Messages.  
+ * The DataLinkProtocol is the 2nd layer.  It takes care of error correction using CRC and sends the necessary
+ * Positive Acknowledgement (ACK) or Negative Acknowledgement(NAK)
+ *
  * Created by jamsheer on 3/6/15.
  */
-public class AckNakProtocol implements SerialListener {
-    private static final Logger log = LoggerFactory.getLogger(AckNakProtocol.class);
+public class DataLinkProtocol implements SerialListener {
+    private static final Logger log = LoggerFactory.getLogger(DataLinkProtocol.class);
     private static final String INIT = "\u0031\u0021\u0005";
     private static final byte ACK = 6;
     private static final byte STX = 2;
