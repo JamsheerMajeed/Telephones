@@ -35,7 +35,7 @@ public class Bootstrap {
                 } catch (IOException e) {
                 }
             }
-
+            /* Process input commands */
             private void processCommand(String command) {
                 if(command.toUpperCase().equals("EXIT")){
                     serialSender.stop();
