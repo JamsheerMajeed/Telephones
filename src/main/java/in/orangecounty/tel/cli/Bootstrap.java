@@ -53,12 +53,15 @@ public class Bootstrap {
                 } else if(command.toUpperCase().equals("STATUS")){
                     dataLinkProtocol.sendMessage("1!L7007F  ");
                 } else if(command.toUpperCase().equals("CHECKIN")){
-                    dataLinkProtocol.sendMessage("1!L1634B333         21serverroom00000");
+                    dataLinkProtocol.sendMessage("1!L1634B333         21serverroom     ");
 //                    dataLinkProtocol.sendMessage("1!L21266300   SERVERROOM     ");
                     dataLinkProtocol.sendMessage("1!L21266333   serverroom     ");
 
-                } else if(command.toUpperCase().equals("IMAGE")){
-                    dataLinkProtocol.sendMessage("1!L17281333   11100000000000000");
+                } else if(command.toUpperCase().equals("CHANGE")){
+                    dataLinkProtocol.sendMessage("1!L21266333   guestguestguest");
+
+                } else if(command.toUpperCase().equals("CHANGEC")){
+                    dataLinkProtocol.sendMessage("1!L21266333   GUESTGUESTGUEST");
 
                 } else if(command.toUpperCase().equals("CHECKINTWO")){
                     dataLinkProtocol.sendMessage("1!L16111333   ");
