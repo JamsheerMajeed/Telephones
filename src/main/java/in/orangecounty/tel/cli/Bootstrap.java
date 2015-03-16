@@ -58,7 +58,10 @@ public class Bootstrap {
                     dataLinkProtocol.sendMessage("1!L21266333   serverroom     ");
 
                 } else if(command.toUpperCase().equals("CHANGE")){
-                    dataLinkProtocol.sendMessage("1!L21266333   guestguestguest");
+                    dataLinkProtocol.sendMessage("1!L21266333   guest guest    ");
+
+                } else if(command.toUpperCase().equals("CHANGE2")){
+                    dataLinkProtocol.sendMessage("1!L21266333   guestguest     ");
 
                 } else if(command.toUpperCase().equals("CHANGEC")){
                     dataLinkProtocol.sendMessage("1!L21266333   GUESTGUESTGUEST");
