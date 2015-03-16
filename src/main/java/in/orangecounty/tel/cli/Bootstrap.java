@@ -52,8 +52,10 @@ public class Bootstrap {
                     }
                 } else if(command.toUpperCase().equals("STATUS")){
                     dataLinkProtocol.sendMessage("1!L7007F  ");
-                } else if(command.toUpperCase().equals("CHECK")){
-                    dataLinkProtocol.sendMessage("1!L1634B777         21NIKI LAUDA     ");
+                } else if(command.toUpperCase().equals("CHECKIN")){
+                    dataLinkProtocol.sendMessage("1!L1634B300         21VASANTH KABINI ");
+                } else if(command.toUpperCase().equals("CHECKOUT")){
+                    dataLinkProtocol.sendMessage("1!L16112300   ");
                 } else if(command.toUpperCase().equals("GETDATA")){
                     dataLinkProtocol.sendMessage("1!L70078  ");
                 }else if(command.toUpperCase().equals("START")){
