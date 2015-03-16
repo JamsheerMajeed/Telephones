@@ -57,8 +57,17 @@ public class Bootstrap {
 //                    dataLinkProtocol.sendMessage("1!L21266300   SERVERROOM     ");
                     dataLinkProtocol.sendMessage("1!L21266333   serverroom     ");
 
+                } else if(command.toUpperCase().equals("REMOVE")){
+                    dataLinkProtocol.sendMessage("1!L21266333                  ");
+
+                } else if(command.toUpperCase().equals("SET")){
+                    dataLinkProtocol.sendMessage("1!L15141333   1  ");
+
+                } else if(command.toUpperCase().equals("UNSET")){
+                    dataLinkProtocol.sendMessage("1!L15141333   1  ");
+
                 } else if(command.toUpperCase().equals("CHANGE")){
-                    dataLinkProtocol.sendMessage("1!L21266333   guest guest    ");
+                    dataLinkProtocol.sendMessage("1!L21266333   333            ");
 
                 } else if(command.toUpperCase().equals("CHANGE2")){
                     dataLinkProtocol.sendMessage("1!L21266333   guestguest     ");
