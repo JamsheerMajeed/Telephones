@@ -54,6 +54,10 @@ public class Bootstrap {
                     dataLinkProtocol.sendMessage("1!L7007F  ");
                 } else if(command.toUpperCase().equals("CHECKIN")){
                     dataLinkProtocol.sendMessage("1!L1634B300         21VASANTH KABINI ");
+                    dataLinkProtocol.sendMessage("1!L21266300   SERVER ROOM    ");
+                } else if(command.toUpperCase().equals("CHECKINTWO")){
+                    dataLinkProtocol.sendMessage("1!L16111300   ");
+                    dataLinkProtocol.sendMessage("1!L21266300   SERVER ROOM    ");
                 } else if(command.toUpperCase().equals("CHECKOUT")){
                     dataLinkProtocol.sendMessage("1!L16112300   ");
                 } else if(command.toUpperCase().equals("GETDATA")){
