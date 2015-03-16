@@ -64,7 +64,7 @@ public class Bootstrap {
                     dataLinkProtocol.sendMessage("1!L15141333   1  ");
 
                 } else if(command.toUpperCase().equals("UNSET")){
-                    dataLinkProtocol.sendMessage("1!L15141333   1  ");
+                    dataLinkProtocol.sendMessage("1!L15141333   0  ");
 
                 } else if(command.toUpperCase().equals("CHANGE")){
                     dataLinkProtocol.sendMessage("1!L21266333   333            ");
