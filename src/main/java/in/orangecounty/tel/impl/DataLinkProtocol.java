@@ -38,6 +38,7 @@ public class DataLinkProtocol implements SerialListener {
     ScheduledFuture initFuture;
     ScheduledFuture messageFuture;
     private int messageCounter = 0;
+    private NEAX7400PmsProtocol neax7400PmsProtocol;
 
 
     SerialSender serialSender;
@@ -112,6 +113,11 @@ public class DataLinkProtocol implements SerialListener {
             /*//Stop Timer 1-1*/
             initFuture.cancel(true);
             sendEOT();
+        } else if((message[0] == STX) &&(Arrays.equals(Arrays.copyOfRange(message,1,9),new byte[]{'1','!','L','1','4','5','0','2'}))){
+
+                log.debug("---- Received station message ");
+                neax7400PmsProtocol = new NEAX7400PmsProtocol();
+                neax7400PmsProtocol.parseCallDetails(Arrays.copyOfRange(message,9,48).toString());
         } else {
             log.debug("Received : {}", new String(message));
         }
