@@ -25,7 +25,7 @@ public class NEAX7400PmsProtocol {
     }
 
     public void parseCallDetails(String message) {
-
+        System.out.println("message in parse -- "+message);
      int stationNumber,routeNumber,trunkNumber,subscriberNumber,hour,minute,second,duration;
         stationNumber = Integer.parseInt(message.substring(0,4));
         routeNumber = Integer.parseInt(message.substring(6,9));
