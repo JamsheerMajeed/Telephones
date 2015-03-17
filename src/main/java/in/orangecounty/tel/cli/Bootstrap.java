@@ -1,6 +1,7 @@
 package in.orangecounty.tel.cli;
 
 import in.orangecounty.tel.impl.DataLinkProtocol;
+import in.orangecounty.tel.impl.NEAX7400PmsProtocol;
 import in.orangecounty.tel.impl.SerialImpl;
 import in.orangecounty.tel.SerialSender;
 import org.slf4j.Logger;
@@ -19,8 +20,10 @@ public class Bootstrap {
 
         final DataLinkProtocol dataLinkProtocol = new DataLinkProtocol();
         final SerialSender serialSender = new SerialImpl();
+        final NEAX7400PmsProtocol neax7400PmsProtocol = new NEAX7400PmsProtocol();
         serialSender.setSerialListener(dataLinkProtocol);
         dataLinkProtocol.setSerialSender(serialSender);
+
 
         Thread t2 = new Thread(new Runnable() {
             @Override
@@ -66,8 +69,12 @@ public class Bootstrap {
                 } else if(command.toUpperCase().equals("UNSET")){
                     dataLinkProtocol.sendMessage("1!L15141333   0  ");
 
+                } else if(command.toUpperCase().equals("SYNC")){
+                    neax7400PmsProtocol.sync();
+
                 } else if(command.toUpperCase().equals("CHANGE")){
                     dataLinkProtocol.sendMessage("1!L21266333   333            ");
+
 
                 } else if(command.toUpperCase().equals("CHANGE2")){
                     dataLinkProtocol.sendMessage("1!L21266333   guestguest     ");
