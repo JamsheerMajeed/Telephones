@@ -74,13 +74,17 @@ public class DataLinkProtocol implements SerialListener {
             log.debug("Message BCC {} | Calculated BCC {}", message[message.length - 1], bcc);
             if(message[message.length-1] == bcc){
                 log.info("Receive Message : {}", new String(payload));
-                log.debug("---- Received station message ");
-                neax7400PmsProtocol = new NEAX7400PmsProtocol();
-                neax7400PmsProtocol.parseCallDetails(Arrays.copyOfRange(message,9,48).toString());
+                log.debug("---- Received station message "+Arrays.copyOfRange(message,1,9)+" to string"+Arrays.copyOfRange(message,1,9).toString());
+
+                if((Arrays.equals(Arrays.copyOfRange(message,1,9),new byte[]{'1','!','L','1','4','5','0','2'}))){
+                    log.debug(" equals");
+                    neax7400PmsProtocol = new NEAX7400PmsProtocol();
+                    neax7400PmsProtocol.parseCallDetails(Arrays.copyOfRange(message,9,48).toString());
                 /*//Stop Timer 2-1 (32 Seconds)
                 sendACK();
                 //Start Timer 2-2 (32 Seconds)*/
-                sendACK();
+                    sendACK();
+                }
             }
             else {
                 sendNAK();
