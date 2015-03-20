@@ -151,8 +151,15 @@ public class DataLinkProtocol implements SerialListener {
         statusFuture = statusScheduler.scheduleAtFixedRate(new Runnable() {
             @Override
             public void run() {
+                if(receiving == false){
                     sendMessage("1!L7007F  ");
-                System.out.println("--------- Sending status ----------");
+                    System.out.println("--------- Sending status ----------");
+                }
+                 else {
+
+                    System.out.println("--------- Sending status interrupted ----------");
+                }
+
             }
         },0l,1l,TimeUnit.MINUTES);
     }
