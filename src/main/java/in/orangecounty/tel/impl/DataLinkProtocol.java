@@ -35,8 +35,10 @@ public class DataLinkProtocol implements SerialListener {
     private String messageToSend = null;
     ScheduledExecutorService initScheduler = Executors.newSingleThreadScheduledExecutor();
     ScheduledExecutorService messageScheduler = Executors.newSingleThreadScheduledExecutor();
+    ScheduledExecutorService statusScheduler = Executors.newSingleThreadScheduledExecutor();
     ScheduledFuture initFuture;
     ScheduledFuture messageFuture;
+    ScheduledFuture statusFuture;
     private int messageCounter = 0;
     private NEAX7400PmsProtocol neax7400PmsProtocol;
 
@@ -143,6 +145,16 @@ public class DataLinkProtocol implements SerialListener {
                 }
             }
         },0l,1l, TimeUnit.SECONDS);
+    }
+
+    public void sendStatus(){
+        statusFuture = statusScheduler.scheduleAtFixedRate(new Runnable() {
+            @Override
+            public void run() {
+                    sendMessage("1!L7007F  ");
+                System.out.println("--------- Sending status ----------");
+            }
+        },0l,1l,TimeUnit.SECONDS);
     }
 
     private void sendMessageHeader(final String message){
