@@ -26,15 +26,26 @@ public class NEAX7400PmsProtocol {
 
     public void parseCallDetails(String message) {
         System.out.println("message in parse -- "+message);
-     int stationNumber,routeNumber,trunkNumber,subscriberNumber,hour,minute,second,duration;
-        stationNumber = Integer.parseInt(message.substring(0,4));
-        routeNumber = Integer.parseInt(message.substring(6,9));
-        trunkNumber = Integer.parseInt(message.substring(9,12));
-        subscriberNumber = Integer.parseInt(message.substring(12,28));
-        hour = Integer.parseInt(message.substring(28,30));
-        minute = Integer.parseInt(message.substring(30,32));
-        second = Integer.parseInt(message.substring(32,34));
-        duration = Integer.parseInt(message.substring(34,39));
+//     int stationNumber,routeNumber,trunkNumber,subscriberNumber,hour,minute,second,duration;
+//        stationNumber = Integer.parseInt(message.substring(0,4));
+//        routeNumber = Integer.parseInt(message.substring(6,9));
+//        trunkNumber = Integer.parseInt(message.substring(9,12));
+//        subscriberNumber = Integer.parseInt(message.substring(12,28));
+//        hour = Integer.parseInt(message.substring(28,30));
+//        minute = Integer.parseInt(message.substring(30,32));
+//        second = Integer.parseInt(message.substring(32,34));
+//        duration = Integer.parseInt(message.substring(34,39));
+
+
+        String stationNumber,routeNumber,trunkNumber,subscriberNumber,hour,minute,second,duration;
+        stationNumber = message.substring(0,4);
+        routeNumber = message.substring(6,9);
+        trunkNumber = message.substring(9,12);
+        subscriberNumber = message.substring(12,28);
+        hour = message.substring(28,30);
+        minute = message.substring(30,32);
+        second = message.substring(32,34);
+        duration = message.substring(34,39);
 
         System.out.println("Station Number"+stationNumber);
         System.out.println("Route Number"+routeNumber);
