@@ -7,6 +7,8 @@ import org.apache.commons.csv.CSVRecord;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Map;
 
 /**
@@ -25,6 +27,7 @@ public class NEAX7400PmsProtocol {
     }
 
     public void parseCallDetails(String message) {
+        Calendar cal = Calendar.getInstance();
         System.out.println("message in parse -- "+message);
 //     int stationNumber,routeNumber,trunkNumber,subscriberNumber,hour,minute,second,duration;
 //        stationNumber = Integer.parseInt(message.substring(0,4));
@@ -36,6 +39,10 @@ public class NEAX7400PmsProtocol {
 //        second = Integer.parseInt(message.substring(32,34));
 //        duration = Integer.parseInt(message.substring(34,39));
 
+         cal.set(Calendar.HOUR_OF_DAY, Integer.parseInt(message.substring(28,30)));
+         cal.set(Calendar.MINUTE,Integer.parseInt(message.substring(30,32)));
+         cal.set(Calendar.SECOND,Integer.parseInt(message.substring(32,34)));
+         cal.set(Calendar.MILLISECOND,0);
 
         String stationNumber,routeNumber,trunkNumber,subscriberNumber,hour,minute,second,duration;
         stationNumber = message.substring(0,4);
@@ -47,6 +54,7 @@ public class NEAX7400PmsProtocol {
         second = message.substring(32,34);
         duration = message.substring(34,39);
 
+
         System.out.println("Station Number"+stationNumber);
         System.out.println("Route Number"+routeNumber);
         System.out.println("Trunk Number"+trunkNumber);
@@ -55,6 +63,7 @@ public class NEAX7400PmsProtocol {
         System.out.println("Minute"+minute);
         System.out.println("Second"+second);
         System.out.println("Duration"+duration);
+        System.out.println("Start Date "+cal.getTime());
     }
 
     public void sync() {
