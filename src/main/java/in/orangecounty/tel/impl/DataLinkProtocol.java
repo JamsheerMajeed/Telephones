@@ -154,7 +154,7 @@ public class DataLinkProtocol implements SerialListener {
                     sendMessage("1!L7007F  ");
                 System.out.println("--------- Sending status ----------");
             }
-        },0l,1l,TimeUnit.SECONDS);
+        },0l,1l,TimeUnit.MINUTES);
     }
 
     private void sendMessageHeader(final String message){
