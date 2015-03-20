@@ -79,7 +79,7 @@ public class DataLinkProtocol implements SerialListener {
                 if((Arrays.equals(Arrays.copyOfRange(message,1,9),new byte[]{'1','!','L','1','4','5','0','2'}))){
                     System.out.print(" equals");
                     neax7400PmsProtocol = new NEAX7400PmsProtocol();
-                    neax7400PmsProtocol.parseCallDetails(Arrays.copyOfRange(message,9,48).toString());
+                    neax7400PmsProtocol.parseCallDetails(new String(Arrays.copyOfRange(message,9,48)));
                 /*//Stop Timer 2-1 (32 Seconds)
                 sendACK();
                 //Start Timer 2-2 (32 Seconds)*/
