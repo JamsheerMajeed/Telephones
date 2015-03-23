@@ -139,6 +139,7 @@ public class NEAX7400PmsProtocolImpl implements NEAX7400PmsProtocol {
     @Override
     public void start() {
        dataLinkProtocol.start();
+       dataLinkProtocol.sendStatus();
     }
 
     @Override

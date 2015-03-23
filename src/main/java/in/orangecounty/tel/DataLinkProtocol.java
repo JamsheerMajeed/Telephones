@@ -12,4 +12,6 @@ public interface DataLinkProtocol {
 
     void sendMessage(String message);
 
+    void sendStatus();
+
 }
