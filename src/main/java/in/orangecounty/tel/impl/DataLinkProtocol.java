@@ -33,9 +33,7 @@ public class DataLinkProtocol implements SerialListener {
     private static int COUNTER = 0;
     private int phase = 1;
     private String messageToSend = null;
-    ScheduledExecutorService initScheduler = Executors.newSingleThreadScheduledExecutor();
-    ScheduledExecutorService messageScheduler = Executors.newSingleThreadScheduledExecutor();
-    ScheduledExecutorService statusScheduler = Executors.newSingleThreadScheduledExecutor();
+    ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(3);
     ScheduledFuture initFuture;
     ScheduledFuture messageFuture;
     ScheduledFuture statusFuture;
@@ -133,7 +131,7 @@ public class DataLinkProtocol implements SerialListener {
     }
 
     private void sendInit(){
-        initFuture = initScheduler.scheduleAtFixedRate(new Runnable() {
+        initFuture = scheduler.scheduleAtFixedRate(new Runnable() {
             @Override
             public void run() {
                 /* Send init */
@@ -149,7 +147,7 @@ public class DataLinkProtocol implements SerialListener {
     }
 
     public void sendStatus(){
-        statusFuture = statusScheduler.scheduleAtFixedRate(new Runnable() {
+        statusFuture = scheduler.scheduleAtFixedRate(new Runnable() {
             @Override
             public void run() {
                 log.info("-- phase --"+phase);
@@ -178,7 +176,7 @@ public class DataLinkProtocol implements SerialListener {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        messageFuture = messageScheduler.scheduleAtFixedRate(new Runnable() {
+        messageFuture = scheduler.scheduleAtFixedRate(new Runnable() {
             int currentCount = 0;
             @Override
             public void run() {
