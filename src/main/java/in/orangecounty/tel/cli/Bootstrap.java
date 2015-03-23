@@ -20,11 +20,7 @@ public class Bootstrap {
     public static void main(String[] args) {
 
         final DataLinkProtocolImpl dataLinkProtocolImpl = new DataLinkProtocolImpl();
-        final SerialSender serialSender = new SerialImpl();
         final NEAX7400PmsProtocol neax7400PmsProtocol = new NEAX7400PmsProtocolImpl();
-        final NEAX7400PmsProtocolImpl neax7400PmsProtocolImpl = new NEAX7400PmsProtocolImpl();
-        serialSender.setSerialListener(dataLinkProtocolImpl);
-        dataLinkProtocolImpl.setSerialSender(serialSender);
 
 
         Thread t2 = new Thread(new Runnable() {
@@ -43,15 +39,15 @@ public class Bootstrap {
             /* Process input commands */
             private void processCommand(String command) {
                 if(command.toUpperCase().equals("EXIT")){
-                    serialSender.stop();
+//                    serialSender.stop();
                     System.exit(0);
                 } else if(command.toUpperCase().equals("STOP")){
-                    serialSender.stop();
+//                    serialSender.stop();
                 } else if(command.toUpperCase().equals("LIST")){
-                    serialSender.listPorts();
+//                    serialSender.listPorts();
                 } else if(command.toUpperCase().equals("ENQ")){
                     try {
-                        serialSender.sendMessage(new byte[]{5});
+//                        serialSender.sendMessage(new byte[]{5});
                     } catch (Exception e) {
                         log.debug("Exception on Send Message", e);
                     }
@@ -72,7 +68,7 @@ public class Bootstrap {
                     dataLinkProtocolImpl.sendMessage("1!L15141333   0  ");
 
                 } else if(command.toUpperCase().equals("SYNC")){
-                    neax7400PmsProtocolImpl.sync();
+//                    neax7400PmsProtocolImpl.sync();
 
                 } else if(command.toUpperCase().equals("CHANGE")){
                     dataLinkProtocolImpl.sendMessage("1!L21266333   333            ");
@@ -94,6 +90,7 @@ public class Bootstrap {
                 }else if(command.toUpperCase().equals("START")){
 
 //                        serialSender.start();
+
                         neax7400PmsProtocol.start();
 
 

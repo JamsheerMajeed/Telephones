@@ -22,6 +22,7 @@ import java.util.concurrent.TimeUnit;
  * Created by jamsheer on 3/6/15.
  */
 public class DataLinkProtocolImpl implements SerialListener,DataLinkProtocol {
+
     private static final Logger log = LoggerFactory.getLogger(DataLinkProtocolImpl.class);
     private static final String INIT = "\u0031\u0021\u0005";
     private static final byte ACK = 6;
@@ -45,6 +46,10 @@ public class DataLinkProtocolImpl implements SerialListener,DataLinkProtocol {
     SerialSender serialSender;
     private boolean receiving = false;
 
+    public DataLinkProtocolImpl() {
+        serialSender = new SerialImpl();
+        serialSender.setSerialListener(this);
+    }
 
     public void setSerialSender(SerialSender serialSender) {
         this.serialSender = serialSender;
@@ -253,6 +258,7 @@ public class DataLinkProtocolImpl implements SerialListener,DataLinkProtocol {
     @Override
     public void start() {
         try {
+
             serialSender.start();
         } catch (IOException e) {
             e.printStackTrace();
