@@ -134,6 +134,7 @@ public class DataLinkProtocol implements SerialListener {
 
     private void sendInit(){
         if(initFuture==null || initFuture.isCancelled()){
+            log.debug("Return without Sending");
             return;
         } else {
             initFuture = scheduler.scheduleAtFixedRate(new Runnable() {
@@ -177,7 +178,7 @@ public class DataLinkProtocol implements SerialListener {
                 }
 
             }
-        },0l,500l,TimeUnit.MILLISECONDS);
+        },0l,3l,TimeUnit.SECONDS);
     }
 
     private void sendMessageHeader(final String message){
