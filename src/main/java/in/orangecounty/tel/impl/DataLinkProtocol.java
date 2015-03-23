@@ -133,19 +133,29 @@ public class DataLinkProtocol implements SerialListener {
     }
 
     private void sendInit(){
-        initFuture = scheduler.scheduleAtFixedRate(new Runnable() {
-            @Override
-            public void run() {
+        if(initFuture==null || initFuture.isCancelled()){
+            return;
+        } else {
+            initFuture = scheduler.scheduleAtFixedRate(new Runnable() {
+                private int counter = 0;
+                @Override
+                public void run() {
+                    if(counter < 16){
                 /* Send init */
-
-                try {
-                    log.info("inside sendInit");
-                    serialSender.sendMessage(INIT.getBytes());
-                } catch (IOException e) {
-                    e.printStackTrace();
+                        try {
+                            log.info("inside sendInit");
+                            serialSender.sendMessage(INIT.getBytes());
+                            counter++;
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    } else {
+                        sendEOT();
+                        initFuture.cancel(true);
+                    }
                 }
-            }
-        },0l,1l, TimeUnit.SECONDS);
+            },0l,1l, TimeUnit.SECONDS);
+        }
     }
 
     public void sendStatus(){
