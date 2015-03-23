@@ -1,5 +1,7 @@
 package in.orangecounty.tel.impl;
 
+import in.orangecounty.tel.DataLinkProtocol;
+import in.orangecounty.tel.NEAX7400PmsProtocol;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
@@ -14,7 +16,9 @@ import java.util.Map;
 /**
  * Created by jamsheer on 3/16/15.
  */
-public class NEAX7400PmsProtocol {
+public class NEAX7400PmsProtocolImpl implements NEAX7400PmsProtocol {
+
+    DataLinkProtocol dataLinkProtocol = new DataLinkProtocolImpl();;
 
     public void checkIn(String guestName, String extension) {
         setRestriction(extension,"0");
@@ -132,4 +136,8 @@ public class NEAX7400PmsProtocol {
     }
 
 
+    @Override
+    public void start() {
+       dataLinkProtocol.start();
+    }
 }

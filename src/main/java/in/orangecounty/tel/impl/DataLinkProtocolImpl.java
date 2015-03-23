@@ -1,5 +1,6 @@
 package in.orangecounty.tel.impl;
 
+import in.orangecounty.tel.DataLinkProtocol;
 import in.orangecounty.tel.SerialListener;
 import in.orangecounty.tel.SerialSender;
 import org.apache.commons.lang.ArrayUtils;
@@ -20,8 +21,8 @@ import java.util.concurrent.TimeUnit;
  *
  * Created by jamsheer on 3/6/15.
  */
-public class DataLinkProtocol implements SerialListener {
-    private static final Logger log = LoggerFactory.getLogger(DataLinkProtocol.class);
+public class DataLinkProtocolImpl implements SerialListener,DataLinkProtocol {
+    private static final Logger log = LoggerFactory.getLogger(DataLinkProtocolImpl.class);
     private static final String INIT = "\u0031\u0021\u0005";
     private static final byte ACK = 6;
     private static final byte STX = 2;
@@ -38,7 +39,7 @@ public class DataLinkProtocol implements SerialListener {
     ScheduledFuture messageFuture;
     ScheduledFuture statusFuture;
     private int messageCounter = 0;
-    private NEAX7400PmsProtocol neax7400PmsProtocol;
+    private NEAX7400PmsProtocolImpl neax7400PmsProtocolImpl;
 
 
     SerialSender serialSender;
@@ -80,8 +81,8 @@ public class DataLinkProtocol implements SerialListener {
 
                 if((Arrays.equals(Arrays.copyOfRange(message,1,9),new byte[]{'1','!','L','1','4','5','0','2'}))){
                     System.out.print(" equals");
-                    neax7400PmsProtocol = new NEAX7400PmsProtocol();
-                    neax7400PmsProtocol.parseCallDetails(new String(Arrays.copyOfRange(message,9,48)));
+                    neax7400PmsProtocolImpl = new NEAX7400PmsProtocolImpl();
+                    neax7400PmsProtocolImpl.parseCallDetails(new String(Arrays.copyOfRange(message,9,48)));
                 /*//Stop Timer 2-1 (32 Seconds)
                 sendACK();
                 //Start Timer 2-2 (32 Seconds)*/
@@ -177,7 +178,7 @@ public class DataLinkProtocol implements SerialListener {
                 }
 
             }
-        },0l,3l,TimeUnit.SECONDS);
+        },10l,10l,TimeUnit.SECONDS);
     }
 
     private void sendMessageHeader(final String message){
@@ -247,5 +248,14 @@ public class DataLinkProtocol implements SerialListener {
             lrc = (byte) (lrc ^ msg[x]);
         }
         return lrc;
+    }
+
+    @Override
+    public void start() {
+        try {
+            serialSender.start();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

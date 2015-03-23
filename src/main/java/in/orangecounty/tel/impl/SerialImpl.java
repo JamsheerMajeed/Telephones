@@ -23,7 +23,7 @@ public class SerialImpl implements SerialSender {
     private InputStream inputStream;
     private OutputStream outputStream;
     private SerialPort serialPort;
-    private DataLinkProtocol dataLinkProtocol;
+    private DataLinkProtocolImpl dataLinkProtocolImpl;
 
 
     @Override
@@ -42,8 +42,8 @@ public class SerialImpl implements SerialSender {
             throw new IOException("Set Environment Variable " + envVarName);
         }
         this.connect(env.get(envVarName));
-        dataLinkProtocol = new DataLinkProtocol();
-         dataLinkProtocol.sendStatus();
+        dataLinkProtocolImpl = new DataLinkProtocolImpl();
+         dataLinkProtocolImpl.sendStatus();
 //        this.connect(env.get("/dev/ttyUSB0"));
 
     }
