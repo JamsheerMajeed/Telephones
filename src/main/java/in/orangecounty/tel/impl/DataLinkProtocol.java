@@ -133,10 +133,7 @@ public class DataLinkProtocol implements SerialListener {
     }
 
     private void sendInit(){
-        if(initFuture!=null || !initFuture.isCancelled()){
-            log.debug("Return without Sending");
-            return;
-        } else {
+        if(initFuture!=null && !initFuture.isCancelled()){
             initFuture = scheduler.scheduleAtFixedRate(new Runnable() {
                 private int counter = 0;
                 @Override
