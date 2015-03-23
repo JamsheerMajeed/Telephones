@@ -77,6 +77,7 @@ public class SerialImpl implements SerialSender {
         if (outputStream != null) {
             log.debug("Sending Message : {}", message);
             outputStream.write(message);
+//            dataLinkProtocol.statusFuture.cancel(false);
         } else {
             throw new IOException("No Output Stream.  Call start() before calling sendMessage()");
         }

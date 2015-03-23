@@ -139,6 +139,7 @@ public class DataLinkProtocol implements SerialListener {
                 /* Send init */
 
                 try {
+                    log.info("inside sendInit");
                     serialSender.sendMessage(INIT.getBytes());
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -151,6 +152,8 @@ public class DataLinkProtocol implements SerialListener {
         statusFuture = statusScheduler.scheduleAtFixedRate(new Runnable() {
             @Override
             public void run() {
+                log.info("-- phase --"+phase);
+                log.info("-- receiving -- "+receiving);
                 if(receiving == false){
                     sendMessage("1!L7007F  ");
                     System.out.println("--------- Sending status ----------");
@@ -161,7 +164,7 @@ public class DataLinkProtocol implements SerialListener {
                 }
 
             }
-        },0l,2l,TimeUnit.MINUTES);
+        },0l,500l,TimeUnit.MILLISECONDS);
     }
 
     private void sendMessageHeader(final String message){
