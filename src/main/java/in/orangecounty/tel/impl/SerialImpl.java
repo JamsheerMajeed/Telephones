@@ -43,7 +43,7 @@ public class SerialImpl implements SerialSender {
         }
         this.connect(env.get(envVarName));
         dataLinkProtocol = new DataLinkProtocol();
-        dataLinkProtocol.sendStatus();
+         dataLinkProtocol.sendStatus();
 //        this.connect(env.get("/dev/ttyUSB0"));
 
     }
