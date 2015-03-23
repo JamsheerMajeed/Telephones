@@ -5,4 +5,12 @@ package in.orangecounty.tel;
  */
 public interface NEAX7400PmsProtocol {
     public void start();
+
+    void stop();
+
+    void listPorts();
+
+    void sendMessage(String message);
+
+    void sync();
 }

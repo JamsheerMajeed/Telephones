@@ -42,51 +42,55 @@ public class Bootstrap {
 //                    serialSender.stop();
                     System.exit(0);
                 } else if(command.toUpperCase().equals("STOP")){
+                    neax7400PmsProtocol.stop();
 //                    serialSender.stop();
                 } else if(command.toUpperCase().equals("LIST")){
 //                    serialSender.listPorts();
+                    neax7400PmsProtocol.listPorts();
                 } else if(command.toUpperCase().equals("ENQ")){
                     try {
 //                        serialSender.sendMessage(new byte[]{5});
+//                        neax7400PmsProtocol.sendMessage(new byte[]{5});
                     } catch (Exception e) {
                         log.debug("Exception on Send Message", e);
                     }
                 } else if(command.toUpperCase().equals("STATUS")){
-                    dataLinkProtocolImpl.sendMessage("1!L7007F  ");
+                    neax7400PmsProtocol.sendMessage("1!L7007F  ");
+//                    neax7400PmsProtocol.sendMessage("1!L7007F  ");
                 } else if(command.toUpperCase().equals("CHECKIN")){
-                    dataLinkProtocolImpl.sendMessage("1!L1634B333         21serverroom     ");
+                    neax7400PmsProtocol.sendMessage("1!L1634B333         21serverroom     ");
 //                    dataLinkProtocol.sendMessage("1!L21266300   SERVERROOM     ");
-                    dataLinkProtocolImpl.sendMessage("1!L21266333   serverroom     ");
+                    neax7400PmsProtocol.sendMessage("1!L21266333   serverroom     ");
 
                 } else if(command.toUpperCase().equals("REMOVE")){
-                    dataLinkProtocolImpl.sendMessage("1!L21266333                  ");
+                    neax7400PmsProtocol.sendMessage("1!L21266333                  ");
 
                 } else if(command.toUpperCase().equals("SET")){
-                    dataLinkProtocolImpl.sendMessage("1!L15141333   1  ");
+                    neax7400PmsProtocol.sendMessage("1!L15141333   1  ");
 
                 } else if(command.toUpperCase().equals("UNSET")){
-                    dataLinkProtocolImpl.sendMessage("1!L15141333   0  ");
+                    neax7400PmsProtocol.sendMessage("1!L15141333   0  ");
 
                 } else if(command.toUpperCase().equals("SYNC")){
-//                    neax7400PmsProtocolImpl.sync();
+                    neax7400PmsProtocol.sync();
 
                 } else if(command.toUpperCase().equals("CHANGE")){
-                    dataLinkProtocolImpl.sendMessage("1!L21266333   333            ");
+                    neax7400PmsProtocol.sendMessage("1!L21266333   333            ");
 
 
                 } else if(command.toUpperCase().equals("CHANGE2")){
-                    dataLinkProtocolImpl.sendMessage("1!L21266333   guestguest     ");
+                    neax7400PmsProtocol.sendMessage("1!L21266333   guestguest     ");
 
                 } else if(command.toUpperCase().equals("CHANGEC")){
-                    dataLinkProtocolImpl.sendMessage("1!L21266333   GUESTGUESTGUEST");
+                    neax7400PmsProtocol.sendMessage("1!L21266333   GUESTGUESTGUEST");
 
                 } else if(command.toUpperCase().equals("CHECKINTWO")){
-                    dataLinkProtocolImpl.sendMessage("1!L16111333   ");
-                    dataLinkProtocolImpl.sendMessage("1!L21266333   serverroom     ");
+                    neax7400PmsProtocol.sendMessage("1!L16111333   ");
+                    neax7400PmsProtocol.sendMessage("1!L21266333   serverroom     ");
                 } else if(command.toUpperCase().equals("CHECKOUT")){
-                    dataLinkProtocolImpl.sendMessage("1!L16112333   ");
+                    neax7400PmsProtocol.sendMessage("1!L16112333   ");
                 } else if(command.toUpperCase().equals("GETDATA")){
-                    dataLinkProtocolImpl.sendMessage("1!L70078  ");
+                    neax7400PmsProtocol.sendMessage("1!L70078  ");
                 }else if(command.toUpperCase().equals("START")){
 
 //                        serialSender.start();
@@ -96,7 +100,7 @@ public class Bootstrap {
 
                 } else {
                     try {
-                        dataLinkProtocolImpl.sendMessage(command);
+                        neax7400PmsProtocol.sendMessage(command);
                     } catch (RuntimeException e) {
                         log.debug("Runtime Exception", e);
                     }

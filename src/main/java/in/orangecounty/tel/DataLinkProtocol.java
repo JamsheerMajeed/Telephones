@@ -5,4 +5,11 @@ package in.orangecounty.tel;
  */
 public interface DataLinkProtocol {
     void start();
+
+    void stop();
+
+    void listPorts();
+
+    void sendMessage(String message);
+
 }

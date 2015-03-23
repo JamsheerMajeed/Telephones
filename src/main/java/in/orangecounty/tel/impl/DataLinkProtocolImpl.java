@@ -264,4 +264,16 @@ public class DataLinkProtocolImpl implements SerialListener,DataLinkProtocol {
             e.printStackTrace();
         }
     }
+
+    @Override
+    public void stop() {
+        serialSender.stop();
+    }
+
+    @Override
+    public void listPorts() {
+        serialSender.listPorts();
+    }
+
+
 }

@@ -98,7 +98,7 @@ public class NEAX7400PmsProtocolImpl implements NEAX7400PmsProtocol {
         sb.append("  ");
         sb.append(st);
         sb.append("  ");
-
+        dataLinkProtocol.sendMessage(sb.toString());
     }
 
     private void setName(String extension, String name) {
@@ -109,7 +109,7 @@ public class NEAX7400PmsProtocolImpl implements NEAX7400PmsProtocol {
         sb.append(ext);
         sb.append("  ");
         sb.append(extensionName);
-
+        dataLinkProtocol.sendMessage(sb.toString());
     }
 
     private String modifyExtension(String extension) {
@@ -139,5 +139,20 @@ public class NEAX7400PmsProtocolImpl implements NEAX7400PmsProtocol {
     @Override
     public void start() {
        dataLinkProtocol.start();
+    }
+
+    @Override
+    public void stop() {
+        dataLinkProtocol.stop();
+    }
+
+    @Override
+    public void listPorts() {
+        dataLinkProtocol.listPorts();
+    }
+
+    @Override
+    public void sendMessage(String message) {
+        dataLinkProtocol.sendMessage(message);
     }
 }
