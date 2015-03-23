@@ -50,12 +50,14 @@ public class DataLinkProtocol implements SerialListener {
     }
 
     public void sendMessage(String message) throws RuntimeException{
+        log.debug("Send Message called with {}", message);
         if(phase != 1 & receiving == true){
             throw new RuntimeException("Cannot Send Message Now");
         }else {
             this.messageToSend = message;
             sendInit();
         }
+        log.debug("Send Message Over");
     }
 
     @Override
@@ -153,12 +155,15 @@ public class DataLinkProtocol implements SerialListener {
                 log.info("-- phase --"+phase);
                 log.info("-- receiving -- "+receiving);
                 if(receiving == false){
-                    sendMessage("1!L7007F  ");
-                    System.out.println("--------- Sending status ----------");
+                    try{
+                        sendMessage("1!L7007F  ");
+                        log.info("Sending Status");
+                    } catch (RuntimeException e){
+                        log.info("Runtime Exception", e);
+                    }
                 }
                  else {
-
-                    System.out.println("--------- Sending status interrupted ----------");
+                    log.info("Sending Status Interrupted");
                 }
 
             }
