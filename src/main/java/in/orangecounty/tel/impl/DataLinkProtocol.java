@@ -134,6 +134,8 @@ public class DataLinkProtocol implements SerialListener {
 
     private void sendInit(){
         if(initFuture!=null && !initFuture.isCancelled()){
+            return;
+        } else {
             initFuture = scheduler.scheduleAtFixedRate(new Runnable() {
                 private int counter = 0;
                 @Override
