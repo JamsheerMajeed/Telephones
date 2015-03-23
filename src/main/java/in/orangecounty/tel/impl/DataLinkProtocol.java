@@ -161,7 +161,7 @@ public class DataLinkProtocol implements SerialListener {
                 }
 
             }
-        },0l,1l,TimeUnit.MINUTES);
+        },0l,2l,TimeUnit.MINUTES);
     }
 
     private void sendMessageHeader(final String message){
