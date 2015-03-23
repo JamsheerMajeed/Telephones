@@ -73,11 +73,11 @@ public class SerialImpl implements SerialSender {
     }
 
     @Override
-    public void sendMessage(byte[] message) throws IOException {
+    public void sendMessage(byte[] message) throws Exception {
         if (outputStream != null) {
             log.debug("Sending Message : {}", message);
             outputStream.write(message);
-//            dataLinkProtocol.statusFuture.cancel(false);
+            log.debug("Sending Done");
         } else {
             throw new IOException("No Output Stream.  Call start() before calling sendMessage()");
         }

@@ -146,7 +146,7 @@ public class DataLinkProtocol implements SerialListener {
                             log.info("inside sendInit");
                             serialSender.sendMessage(INIT.getBytes());
                             counter++;
-                        } catch (IOException e) {
+                        } catch (Exception e) {
                             log.debug("IO Exception", e);
                         }
                     } else {
@@ -188,8 +188,8 @@ public class DataLinkProtocol implements SerialListener {
         msg = ArrayUtils.add(msg, 0, STX);
         try {
             serialSender.sendMessage(msg);
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+            log.debug("Exception on Send Message", e);
         }
         messageFuture = scheduler.scheduleAtFixedRate(new Runnable() {
             int currentCount = 0;
@@ -209,16 +209,16 @@ public class DataLinkProtocol implements SerialListener {
     private void sendNAK() {
         try {
             serialSender.sendMessage(new byte[]{NAK});
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+            log.debug("Exception on Send Message", e);
         }
     }
 
     private void sendACK() {
         try {
             serialSender.sendMessage(new byte[]{ACK});
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+            log.debug("Exception on Send Message", e);
         }
     }
 
@@ -227,16 +227,16 @@ public class DataLinkProtocol implements SerialListener {
         messageCounter = 0;
         try {
             serialSender.sendMessage(new byte[]{EOT});
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+            log.debug("Exception on Send Message", e);
         }
     }
 
     private void sendENQ() {
         try {
             serialSender.sendMessage(new byte[]{ENQ});
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+            log.debug("Exception on Send Message", e);
         }
     }
 
