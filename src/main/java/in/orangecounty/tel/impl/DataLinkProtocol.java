@@ -147,7 +147,7 @@ public class DataLinkProtocol implements SerialListener {
                             serialSender.sendMessage(INIT.getBytes());
                             counter++;
                         } catch (IOException e) {
-                            e.printStackTrace();
+                            log.debug("IO Exception", e);
                         }
                     } else {
                         sendEOT();
