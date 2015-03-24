@@ -70,6 +70,8 @@ public class NEAX7400PmsProtocolImpl implements NEAX7400PmsProtocol {
         System.out.println("Start Date "+cal.getTime());
         cal.add(Calendar.DATE,-1);
         System.out.println("Modified date "+cal.getTime());
+        System.out.println("Current date "+new Date());
+        System.out.println("Compare "+cal.getTime().equals(new Date()));
     }
 
     public void sync() {
