@@ -13,4 +13,10 @@ public interface NEAX7400PmsProtocol {
     void sendMessage(String message);
 
     void sync();
+
+    /*   1 - Outgoing Restriction
+    *    0 - No Restriction       */
+    void setRestriction(String extension, String status);
+
+    void setName(String extension, String name);
 }

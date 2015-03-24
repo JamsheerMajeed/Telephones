@@ -32,16 +32,6 @@ public class NEAX7400PmsProtocolImpl implements NEAX7400PmsProtocol {
 
     public void parseCallDetails(String message) {
         Calendar cal = Calendar.getInstance();
-        System.out.println("message in parse -- "+message);
-//     int stationNumber,routeNumber,trunkNumber,subscriberNumber,hour,minute,second,duration;
-//        stationNumber = Integer.parseInt(message.substring(0,4));
-//        routeNumber = Integer.parseInt(message.substring(6,9));
-//        trunkNumber = Integer.parseInt(message.substring(9,12));
-//        subscriberNumber = Integer.parseInt(message.substring(12,28));
-//        hour = Integer.parseInt(message.substring(28,30));
-//        minute = Integer.parseInt(message.substring(30,32));
-//        second = Integer.parseInt(message.substring(32,34));
-//        duration = Integer.parseInt(message.substring(34,39));
 
          cal.set(Calendar.HOUR_OF_DAY, Integer.parseInt(message.substring(28,30)));
          cal.set(Calendar.MINUTE,Integer.parseInt(message.substring(30,32)));
@@ -94,7 +84,7 @@ public class NEAX7400PmsProtocolImpl implements NEAX7400PmsProtocol {
         }
     }
 
-    private void setRestriction(String extension, String status) {
+    public void setRestriction(String extension, String status) {
         StringBuilder sb = new StringBuilder("1!L15141");
         String ext = modifyExtension(extension);
         String st = status.trim();
@@ -105,7 +95,7 @@ public class NEAX7400PmsProtocolImpl implements NEAX7400PmsProtocol {
         dataLinkProtocol.sendMessage(sb.toString());
     }
 
-    private void setName(String extension, String name) {
+    public void setName(String extension, String name) {
 
         String extensionName = modifyName(name);
         String ext = modifyExtension(extension);

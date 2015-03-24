@@ -19,7 +19,6 @@ public class Bootstrap {
     private static final Logger log = LoggerFactory.getLogger(Bootstrap.class);
     public static void main(String[] args) {
 
-        final DataLinkProtocolImpl dataLinkProtocolImpl = new DataLinkProtocolImpl();
         final NEAX7400PmsProtocol neax7400PmsProtocol = new NEAX7400PmsProtocolImpl();
 
 
