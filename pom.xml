@@ -5,7 +5,7 @@
     <groupId>in.orangecounty</groupId>
     <artifactId>tellApp</artifactId>
     <version>1.0</version>
-    <packaging>jar</packaging>
+    <packaging>war</packaging>
 
     <name>tellApp</name>
     <url>http://maven.apache.org</url>
@@ -85,6 +85,11 @@
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-csv</artifactId>
             <version>1.1</version>
+        </dependency>
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
+            <version>3.0.1</version>
         </dependency>
     </dependencies>
     <properties>
