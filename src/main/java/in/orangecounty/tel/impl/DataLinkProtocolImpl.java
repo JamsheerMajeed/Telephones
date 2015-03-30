@@ -1,7 +1,6 @@
 package in.orangecounty.tel.impl;
 
 import in.orangecounty.tel.SerialListener;
-import in.orangecounty.tel.SerialSender;
 import org.apache.commons.lang.ArrayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
