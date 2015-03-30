@@ -4,13 +4,18 @@
          xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee
 http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">
 
+
+
     <servlet>
-        <servlet-name>Servlet Name For Demo1</servlet-name>
+        <servlet-name>MainServlet</servlet-name>
         <servlet-class>in.orangecounty.tel.ServletImpl</servlet-class>
     </servlet>
 
     <servlet-mapping>
-        <servlet-name>Servlet Name For Demo1</servlet-name>
-        <url-pattern>/Demo1</url-pattern>
+        <servlet-name>MainServlet</servlet-name>
+        <url-pattern>/</url-pattern>
     </servlet-mapping>
+    <listener>
+        <listener-class>in.orangecounty.tel.StartupListener</listener-class>
+    </listener>
 </web-app>

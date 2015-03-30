@@ -2,7 +2,6 @@ package in.orangecounty.tel.impl;
 
 import gnu.io.*;
 import in.orangecounty.tel.SerialListener;
-import in.orangecounty.tel.SerialSender;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,16 +16,13 @@ import java.util.TooManyListenersException;
 /**
  * Created by thomas on 6/3/15.
  */
-public class SerialImpl implements SerialSender {
+public class SerialImpl {
     private static final Logger log = LoggerFactory.getLogger(SerialImpl.class);
     private SerialListener serialListener;
     private InputStream inputStream;
     private OutputStream outputStream;
     private SerialPort serialPort;
-    private DataLinkProtocolImpl dataLinkProtocolImpl;
 
-
-    @Override
     public void setSerialListener(SerialListener serialListener) {
         this.serialListener = serialListener;
     }
@@ -42,10 +38,6 @@ public class SerialImpl implements SerialSender {
             throw new IOException("Set Environment Variable " + envVarName);
         }
         this.connect(env.get(envVarName));
-        dataLinkProtocolImpl = new DataLinkProtocolImpl();
-//         dataLinkProtocolImpl.sendStatus();
-//        this.connect(env.get("/dev/ttyUSB0"));
-
     }
 
     public void stop() {
@@ -63,7 +55,6 @@ public class SerialImpl implements SerialSender {
         }
     }
 
-    @Override
     public void listPorts() {
         Enumeration<CommPortIdentifier> portEnum = CommPortIdentifier.getPortIdentifiers();
         while (portEnum.hasMoreElements()){
@@ -72,7 +63,6 @@ public class SerialImpl implements SerialSender {
         }
     }
 
-    @Override
     public void sendMessage(byte[] message) throws Exception {
         if (outputStream != null) {
             log.debug("Sending Message : {}", message);

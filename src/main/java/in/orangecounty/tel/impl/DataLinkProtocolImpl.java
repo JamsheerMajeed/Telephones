@@ -1,6 +1,5 @@
 package in.orangecounty.tel.impl;
 
-import in.orangecounty.tel.DataLinkProtocol;
 import in.orangecounty.tel.SerialListener;
 import in.orangecounty.tel.SerialSender;
 import org.apache.commons.lang.ArrayUtils;
@@ -21,7 +20,7 @@ import java.util.concurrent.TimeUnit;
  *
  * Created by jamsheer on 3/6/15.
  */
-public class DataLinkProtocolImpl implements SerialListener,DataLinkProtocol {
+public class DataLinkProtocolImpl implements SerialListener{
 
     private static final Logger log = LoggerFactory.getLogger(DataLinkProtocolImpl.class);
     private static final String INIT = "\u0031\u0021\u0005";
@@ -43,7 +42,7 @@ public class DataLinkProtocolImpl implements SerialListener,DataLinkProtocol {
     private NEAX7400PmsProtocolImpl neax7400PmsProtocolImpl;
 
 
-    SerialSender serialSender;
+    SerialImpl serialSender;
     private boolean receiving = false;
 
     public DataLinkProtocolImpl() {
@@ -51,7 +50,7 @@ public class DataLinkProtocolImpl implements SerialListener,DataLinkProtocol {
         serialSender.setSerialListener(this);
     }
 
-    public void setSerialSender(SerialSender serialSender) {
+    public void setSerialSender(SerialImpl serialSender) {
         this.serialSender = serialSender;
     }
 
@@ -255,7 +254,6 @@ public class DataLinkProtocolImpl implements SerialListener,DataLinkProtocol {
         return lrc;
     }
 
-    @Override
     public void start() {
         try {
 
@@ -265,12 +263,10 @@ public class DataLinkProtocolImpl implements SerialListener,DataLinkProtocol {
         }
     }
 
-    @Override
     public void stop() {
         serialSender.stop();
     }
 
-    @Override
     public void listPorts() {
         serialSender.listPorts();
     }
