@@ -10,13 +10,15 @@ import java.nio.charset.Charset;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Map;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 
 /**
  * Created by jamsheer on 3/16/15.
  */
 public class NEAX7400PmsProtocolImpl {
 
-    DataLinkProtocolImpl dataLinkProtocol = new DataLinkProtocolImpl();;
+    DataLinkProtocolImpl dataLinkProtocol = new DataLinkProtocolImpl();
 
     public void checkIn(String guestName, String extension) {
         setRestriction(extension,"0");
@@ -131,6 +133,8 @@ public class NEAX7400PmsProtocolImpl {
         System.out.println("calling neax start ---- ");
        dataLinkProtocol.start();
        dataLinkProtocol.sendStatus();
+       dataLinkProtocol.getExtensions();
+
     }
 
     public void stop() {

@@ -1,6 +1,8 @@
 package in.orangecounty.tel.impl;
 
 import in.orangecounty.tel.SerialListener;
+import in.orangecounty.tel.service.PMSRestClient;
+import in.orangecounty.tel.service.impl.PMSRestClientImpl;
 import org.apache.commons.lang.ArrayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,12 +35,14 @@ public class DataLinkProtocolImpl implements SerialListener{
     private static int COUNTER = 0;
     private int phase = 1;
     private String messageToSend = null;
-    ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(3);
+    ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(4);
     ScheduledFuture initFuture;
     ScheduledFuture messageFuture;
     ScheduledFuture statusFuture;
+    ScheduledFuture extensionFuture;
     private int messageCounter = 0;
     private NEAX7400PmsProtocolImpl neax7400PmsProtocolImpl;
+    private PMSRestClient pmsRestClient;
 
 
     SerialImpl serialSender;
@@ -162,6 +166,7 @@ public class DataLinkProtocolImpl implements SerialListener{
         }
     }
 
+
     public void sendStatus(){
         statusFuture = scheduler.scheduleAtFixedRate(new Runnable() {
             @Override
@@ -271,4 +276,13 @@ public class DataLinkProtocolImpl implements SerialListener{
     }
 
 
+    public void getExtensions() {
+        pmsRestClient = new PMSRestClientImpl();
+        extensionFuture = scheduler.scheduleAtFixedRate(new Runnable() {
+            @Override
+            public void run() {
+                pmsRestClient.getExtensions();
+            }
+        },1l,2l,TimeUnit.MINUTES);
+    }
 }
