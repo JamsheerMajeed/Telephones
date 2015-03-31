@@ -23,7 +23,7 @@ import java.util.Map;
  */
 public class PMSRestClientImpl implements PMSRestClient {
     protected final transient Log log = LogFactory.getLog(getClass());
-    private String pmsURL="http://pmscoorg.orangecounty.in/services/api/folioService/";
+    private String pmsURL="http://localhost:8082/services/api/extensionService/";
     private HttpClient client = new HttpClient();
     private HttpMethod method;
     @Override
@@ -33,7 +33,7 @@ public class PMSRestClientImpl implements PMSRestClient {
 
         int statusCode = 0;
         String result = null;
-        method = new GetMethod(pmsURL+"");
+        method = new GetMethod(pmsURL+"activeExtensions");
         try{
             statusCode = client.executeMethod(method);
         }
