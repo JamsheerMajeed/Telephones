@@ -281,7 +281,9 @@ public class DataLinkProtocolImpl implements SerialListener{
         extensionFuture = scheduler.scheduleAtFixedRate(new Runnable() {
             @Override
             public void run() {
+                System.out.println("---- get extensions -----");
                 pmsRestClient.getExtensions();
+
             }
         },1l,2l,TimeUnit.MINUTES);
     }
