@@ -23,7 +23,7 @@ import java.util.Map;
  */
 public class PMSRestClientImpl implements PMSRestClient {
     protected final transient Log log = LogFactory.getLog(getClass());
-    private String pmsURL="http://localhost:8082/services/api/extensionService/";
+    private String pmsURL="localhost:8082/services/api/telephoneService/";
     private HttpClient client = new HttpClient();
     private HttpMethod method;
     @Override
@@ -57,7 +57,7 @@ public class PMSRestClientImpl implements PMSRestClient {
             }
 
         }
-
+        System.out.println("-- here map "+map);
        for(Map.Entry<Long,Map<String,String>> rs:map.entrySet()){
            System.out.println("keys ---"+rs.getKey());
        }
