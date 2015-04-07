@@ -1,8 +1,12 @@
 package in.orangecounty.tel.impl;
 
+import in.orangecounty.tel.service.PMSRestClient;
+import in.orangecounty.tel.service.impl.PMSRestClientImpl;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -12,14 +16,19 @@ import java.util.Date;
 import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by jamsheer on 3/16/15.
  */
 public class NEAX7400PmsProtocolImpl {
 
+    private static final Logger log = LoggerFactory.getLogger(NEAX7400PmsProtocolImpl.class);
     DataLinkProtocolImpl dataLinkProtocol = new DataLinkProtocolImpl();
-
+    ScheduledExecutorService extensionScheduler = Executors.newScheduledThreadPool(1);
+    ScheduledFuture extensionFuture;
+    private PMSRestClient pmsRestClient;
     public void checkIn(String guestName, String extension) {
         setRestriction(extension,"0");
         setName(extension,guestName);
@@ -30,46 +39,35 @@ public class NEAX7400PmsProtocolImpl {
         setName(extension," ");
     }
 
-    public void parseCallDetails(String message) {
-        Calendar cal = Calendar.getInstance();
-
-         cal.set(Calendar.HOUR_OF_DAY, Integer.parseInt(message.substring(28,30)));
-         cal.set(Calendar.MINUTE,Integer.parseInt(message.substring(30,32)));
-         cal.set(Calendar.SECOND,Integer.parseInt(message.substring(32,34)));
-         cal.set(Calendar.MILLISECOND,0);
-
-        String stationNumber,routeNumber,trunkNumber,subscriberNumber,hour,minute,second,duration;
-        stationNumber = message.substring(0,4);
-        routeNumber = message.substring(6,9);
-        trunkNumber = message.substring(9,12);
-        subscriberNumber = message.substring(12,28);
-        hour = message.substring(28,30);
-        minute = message.substring(30,32);
-        second = message.substring(32,34);
-        duration = message.substring(34,39);
 
 
-        System.out.println("Station Number"+stationNumber);
-        System.out.println("Route Number"+routeNumber);
-        System.out.println("Trunk Number"+trunkNumber);
-        System.out.println("Subscriber Number"+subscriberNumber);
-        System.out.println("Hour"+hour);
-        System.out.println("Minute"+minute);
-        System.out.println("Second"+second);
-        System.out.println("Duration"+duration);
-        System.out.println("Start Date "+cal.getTime());
-        cal.add(Calendar.DATE,-1);
-        System.out.println("Modified date "+cal.getTime());
-        System.out.println("Current date "+new Date());
-        System.out.println("Compare "+cal.getTime().equals(new Date()));
+
+    private void setExtensionProperies(Map<Long, Map<String, String>> extensions) {
+//        System.out.println("\n\n extensions  --- "+extensions);
+        String restrictionLevel="0";
+        String restrictionStatus = "";
+        for(Map.Entry<Long,Map<String,String>> outerEntry : extensions.entrySet()){
+            for (Map.Entry<String,String> innerEntry : outerEntry.getValue().entrySet()){
+
+                restrictionStatus = innerEntry.getKey();
+                if(innerEntry.getKey().trim().equals("true")){
+                    restrictionLevel="0";
+                }
+                else if (restrictionStatus.trim().equals("false")){
+                    restrictionLevel="1";
+                }
+                setName(outerEntry.getKey().toString(),innerEntry.getValue());
+                setRestriction(outerEntry.getKey().toString(),restrictionLevel);
+            }
+        }
     }
+
 
     public void sync() {
         CSVParser csvParser = null;
 
 //     String filename ="/home/jamsheer/Desktop/final/kabini_extension_2.csv";
         String filename = "/home/jamsheer/sample_data/kabini_extension_2.csv";
-        System.out.println();
         try {
             csvParser = CSVParser.parse(new File(filename), Charset.defaultCharset(), CSVFormat.EXCEL.withHeader());
             for (CSVRecord csvRecord : csvParser.getRecords()) {
@@ -84,7 +82,10 @@ public class NEAX7400PmsProtocolImpl {
         }
     }
 
+    /* 0 - No restriction
+    *  1 - Outward Restriction */
     public void setRestriction(String extension, String status) {
+        System.out.println("Set restriction "+extension+" to "+status);
         StringBuilder sb = new StringBuilder("1!L15141");
         String ext = modifyExtension(extension);
         String st = status.trim();
@@ -97,6 +98,7 @@ public class NEAX7400PmsProtocolImpl {
 
     public void setName(String extension, String name) {
 
+        System.out.println("set name "+extension+" to "+name);
         String extensionName = modifyName(name);
         String ext = modifyExtension(extension);
         StringBuilder sb = new StringBuilder("1!L21266");
@@ -107,7 +109,7 @@ public class NEAX7400PmsProtocolImpl {
     }
 
     private String modifyExtension(String extension) {
-
+        extension=extension.trim();
         StringBuilder sb = new StringBuilder(extension);
         while (sb.length() < 4) {
             sb.append(" ");
@@ -130,12 +132,19 @@ public class NEAX7400PmsProtocolImpl {
     }
 
     public void start() {
-        System.out.println("calling neax start ---- ");
+        log.warn("calling neax start ---- ");
        dataLinkProtocol.start();
        dataLinkProtocol.sendStatus();
-       dataLinkProtocol.getExtensions();
-
+        pmsRestClient = new PMSRestClientImpl();
+        extensionFuture = extensionScheduler.scheduleAtFixedRate(new Runnable() {
+            @Override
+            public void run() {
+                System.out.println("\n\n---- get extensions --"+Calendar.getInstance().getTime()+"---\n\n");
+                    setExtensionProperies(pmsRestClient.getExtensions());
+            }
+        },0,2, TimeUnit.MINUTES);
     }
+
 
     public void stop() {
         System.out.println("--- calling neax stop");

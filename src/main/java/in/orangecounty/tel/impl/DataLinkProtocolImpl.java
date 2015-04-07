@@ -8,7 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.Arrays;
+import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -35,14 +35,15 @@ public class DataLinkProtocolImpl implements SerialListener{
     private static int COUNTER = 0;
     private int phase = 1;
     private String messageToSend = null;
-    ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(4);
+    ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(3);
+
     ScheduledFuture initFuture;
     ScheduledFuture messageFuture;
     ScheduledFuture statusFuture;
-    ScheduledFuture extensionFuture;
     private int messageCounter = 0;
     private NEAX7400PmsProtocolImpl neax7400PmsProtocolImpl;
     private PMSRestClient pmsRestClient;
+
 
 
     SerialImpl serialSender;
@@ -89,7 +90,10 @@ public class DataLinkProtocolImpl implements SerialListener{
                 if((Arrays.equals(Arrays.copyOfRange(message,1,9),new byte[]{'1','!','L','1','4','5','0','2'}))){
                     System.out.print(" equals");
                     neax7400PmsProtocolImpl = new NEAX7400PmsProtocolImpl();
-                    neax7400PmsProtocolImpl.parseCallDetails(new String(Arrays.copyOfRange(message,9,48)));
+                    pmsRestClient = new PMSRestClientImpl();
+                    pmsRestClient.updateCallCharges(parseCallDetails(new String(Arrays.copyOfRange(message, 9, 48))));
+
+
                 /*//Stop Timer 2-1 (32 Seconds)
                 sendACK();
                 //Start Timer 2-2 (32 Seconds)*/
@@ -120,7 +124,7 @@ public class DataLinkProtocolImpl implements SerialListener{
             if(phase==2){
                 if(messageCounter<4){
                     messageFuture.cancel(true);
-                    sendMessageHeader("Hello");
+//                    sendMessageHeader("Hello");
                 } else {
                     messageFuture.cancel(true);
                     sendEOT();
@@ -276,15 +280,62 @@ public class DataLinkProtocolImpl implements SerialListener{
     }
 
 
-    public void getExtensions() {
-        pmsRestClient = new PMSRestClientImpl();
-        extensionFuture = scheduler.scheduleAtFixedRate(new Runnable() {
-            @Override
-            public void run() {
-                System.out.println("---- get extensions -----");
-                pmsRestClient.getExtensions();
 
-            }
-        },1l,2l,TimeUnit.MINUTES);
+    public Map<String,Map<String,String>> parseCallDetails(String message) {
+        Calendar cal = Calendar.getInstance();
+        Map<String,Map<String,String>> map = new HashMap<String, Map<String, String>>();
+        Map<String,String> callDetailsMap = new HashMap<String, String>();
+        String startTime="";
+        cal.set(Calendar.HOUR_OF_DAY, Integer.parseInt(message.substring(28,30)));
+        cal.set(Calendar.MINUTE,Integer.parseInt(message.substring(30,32)));
+        cal.set(Calendar.SECOND,Integer.parseInt(message.substring(32,34)));
+        cal.set(Calendar.MILLISECOND,0);
+
+        String stationNumber,routeNumber,trunkNumber,subscriberNumber,hour,minute,second,duration;
+        stationNumber = message.substring(0,4);
+        routeNumber = message.substring(6,9);
+        trunkNumber = message.substring(9,12);
+        subscriberNumber = message.substring(12,28);
+        hour = message.substring(28,30);
+        minute = message.substring(30,32);
+        second = message.substring(32,34);
+        duration = message.substring(34,39);
+
+        startTime = message.substring(28,30)+":"+message.substring(30,32)+":"+message.substring(32,34);
+
+        if(Calendar.getInstance().getTime().before(cal.getTime())){
+            cal.add(Calendar.DATE,-1);
+        }
+
+
+
+        callDetailsMap.put("CALLED_NO",subscriberNumber);
+
+        callDetailsMap.put("START_TIME",startTime);
+
+        callDetailsMap.put("CALL_DURATION",duration);
+        callDetailsMap.put("DATE_OF_CALL",cal.getTime().toString()+" "+startTime);
+
+        map.put(stationNumber,callDetailsMap);
+
+//        System.out.println("Station Number"+stationNumber);
+//        System.out.println("Route Number"+routeNumber);
+//        System.out.println("Trunk Number"+trunkNumber);
+//        System.out.println("Subscriber Number"+subscriberNumber);
+//        System.out.println("Hour"+hour);
+//        System.out.println("Minute"+minute);
+//        System.out.println("Second"+second);
+//        System.out.println("Duration"+duration);
+//        System.out.println("Start Date "+cal.getTime());
+//
+//        System.out.println("Modified date "+cal.getTime());
+//        System.out.println("Current date "+new Date());
+//        System.out.println("Compare "+cal.getTime().equals(new Date()));
+
+
+        return map;
+
+
     }
+
 }
