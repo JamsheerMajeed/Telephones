@@ -34,9 +34,9 @@ public class SerialImpl {
         }
         Map<String, String> env = System.getenv();
         final String envVarName="SERIAL_PORT_NAME";
-        if(env.get(envVarName)==null){
-            throw new IOException("Set Environment Variable " + envVarName);
-        }
+//        if(env.get(envVarName)==null){
+//            throw new IOException("Set Environment Variable " + envVarName);
+//        }
 
 //        this.connect(env.get(envVarName));
         this.connect("/dev/ttyS0");
