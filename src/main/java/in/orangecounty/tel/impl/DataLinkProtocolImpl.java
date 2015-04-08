@@ -41,7 +41,6 @@ public class DataLinkProtocolImpl implements SerialListener{
     ScheduledFuture messageFuture;
     ScheduledFuture statusFuture;
     private int messageCounter = 0;
-    private NEAX7400PmsProtocolImpl neax7400PmsProtocolImpl;
     private PMSRestClient pmsRestClient;
 
 
@@ -49,9 +48,10 @@ public class DataLinkProtocolImpl implements SerialListener{
     SerialImpl serialSender;
     private boolean receiving = false;
 
-    public DataLinkProtocolImpl() {
+    public DataLinkProtocolImpl(PMSRestClient pmsRestClient) {
         serialSender = new SerialImpl();
         serialSender.setSerialListener(this);
+        this.pmsRestClient = pmsRestClient;
     }
 
     public void setSerialSender(SerialImpl serialSender) {
@@ -89,14 +89,7 @@ public class DataLinkProtocolImpl implements SerialListener{
 
                 if((Arrays.equals(Arrays.copyOfRange(message,1,9),new byte[]{'1','!','L','1','4','5','0','2'}))){
                     System.out.print(" equals");
-                    neax7400PmsProtocolImpl = new NEAX7400PmsProtocolImpl();
-                    pmsRestClient = new PMSRestClientImpl();
                     pmsRestClient.updateCallCharges(parseCallDetails(new String(Arrays.copyOfRange(message, 9, 48))));
-
-
-                /*//Stop Timer 2-1 (32 Seconds)
-                sendACK();
-                //Start Timer 2-2 (32 Seconds)*/
                     sendACK();
                 }
             }
@@ -265,7 +258,6 @@ public class DataLinkProtocolImpl implements SerialListener{
 
     public void start() {
         try {
-
             serialSender.start();
         } catch (IOException e) {
             e.printStackTrace();

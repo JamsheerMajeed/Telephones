@@ -25,10 +25,10 @@ import java.util.concurrent.TimeUnit;
 public class NEAX7400PmsProtocolImpl {
 
     private static final Logger log = LoggerFactory.getLogger(NEAX7400PmsProtocolImpl.class);
-    DataLinkProtocolImpl dataLinkProtocol = new DataLinkProtocolImpl();
+    private PMSRestClient pmsRestClient = new PMSRestClientImpl();
+    DataLinkProtocolImpl dataLinkProtocol = new DataLinkProtocolImpl(pmsRestClient);
     ScheduledExecutorService extensionScheduler = Executors.newScheduledThreadPool(1);
     ScheduledFuture extensionFuture;
-    private PMSRestClient pmsRestClient;
     public void checkIn(String guestName, String extension) {
         setRestriction(extension,"0");
         setName(extension,guestName);
@@ -141,7 +141,7 @@ public class NEAX7400PmsProtocolImpl {
         extensionFuture = extensionScheduler.scheduleAtFixedRate(new Runnable() {
             @Override
             public void run() {
-                System.out.println("\n\n---- get extensions --"+Calendar.getInstance().getTime()+"---\n\n");
+                log.debug("\n\n---- get extensions --");
                     setExtensionProperies(pmsRestClient.getExtensions());
             }
         },0,5, TimeUnit.MINUTES);
