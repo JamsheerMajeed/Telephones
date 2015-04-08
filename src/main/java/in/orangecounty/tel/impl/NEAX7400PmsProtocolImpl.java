@@ -133,6 +133,8 @@ public class NEAX7400PmsProtocolImpl {
 
     public void start() {
         log.warn("calling neax start ---- ");
+        SerialImpl serial = new SerialImpl();
+        dataLinkProtocol.setSerialSender(serial);
        dataLinkProtocol.start();
        dataLinkProtocol.sendStatus();
         pmsRestClient = new PMSRestClientImpl();
