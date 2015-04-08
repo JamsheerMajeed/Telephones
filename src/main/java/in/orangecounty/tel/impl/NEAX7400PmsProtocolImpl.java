@@ -142,7 +142,7 @@ public class NEAX7400PmsProtocolImpl {
                 System.out.println("\n\n---- get extensions --"+Calendar.getInstance().getTime()+"---\n\n");
                     setExtensionProperies(pmsRestClient.getExtensions());
             }
-        },0,2, TimeUnit.MINUTES);
+        },0,5, TimeUnit.MINUTES);
     }
 
 
