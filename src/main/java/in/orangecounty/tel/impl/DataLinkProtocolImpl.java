@@ -155,6 +155,7 @@ public class DataLinkProtocolImpl implements SerialListener{
                     if(counter < 16){
                 /* Send init */
                         try {
+                            System.out.println("out put ------ "+serialSender);
                             log.info("inside sendInit");
                             serialSender.sendMessage(INIT.getBytes());
                             counter++;

@@ -29,6 +29,7 @@ public class PMSRestClientImpl implements PMSRestClient {
     private HttpMethod method;
     @Override
     public Map<Long,Map<String,String>> getExtensions() {
+        System.out.println("1");
         Map<Long,Map<String,String>> map = new HashMap<Long, Map<String, String>>();
         int statusCode = 0;
         String result = null;
@@ -38,6 +39,7 @@ public class PMSRestClientImpl implements PMSRestClient {
             statusCode = client.executeMethod(method);
         }
          catch (IOException e) {
+             System.out.println("Exception occured -- "+e);
             e.printStackTrace();
         }
         ObjectMapper mapper = new ObjectMapper();
@@ -69,6 +71,7 @@ public class PMSRestClientImpl implements PMSRestClient {
     @Override
     public void updateCallCharges(Map<String, Map<String, String>> item) {
         PostMethod postMethod = new PostMethod("http://pmskabini.orangecounty.in/services/api/telephoneService/updateCallCharges");
+    //    PostMethod postMethod = new PostMethod("http://localhost:8082/services/api/telephoneService/updateCallCharges");
         System.out.println("-- sending call charges -- "+item);
         ObjectMapper objectMapper = new ObjectMapper();
         try {
