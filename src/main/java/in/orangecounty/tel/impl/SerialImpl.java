@@ -37,7 +37,9 @@ public class SerialImpl {
         if(env.get(envVarName)==null){
             throw new IOException("Set Environment Variable " + envVarName);
         }
-        this.connect(env.get(envVarName));
+
+//        this.connect(env.get(envVarName));
+        this.connect("/dev/ttyS0");
     }
 
     public void stop() {
