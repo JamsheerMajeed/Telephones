@@ -61,6 +61,7 @@ public class PMSRestClientImpl implements PMSRestClient {
 //       for(Map.Entry<Long,Map<String,String>> rs:map.entrySet()){
 //           System.out.println("keys ---"+rs.getKey());
 //       }
+        System.out.println("-- extensions -- "+map);
      return map;
 
     }
@@ -68,6 +69,7 @@ public class PMSRestClientImpl implements PMSRestClient {
     @Override
     public void updateCallCharges(Map<String, Map<String, String>> item) {
         PostMethod postMethod = new PostMethod("http://pmskabini.orangecounty.in/services/api/telephoneService/updateCallCharges");
+        System.out.println("-- sending call charges -- "+item);
         ObjectMapper objectMapper = new ObjectMapper();
         try {
             postMethod.addParameter("callCharges",objectMapper.writeValueAsString(item));
